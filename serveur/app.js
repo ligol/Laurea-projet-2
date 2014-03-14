@@ -23,7 +23,7 @@ io.sockets.on('connection', function(socket){
 	}
 	socket.on('message', function(message){
 	    var response = JSON.parse(message);
-	    map.get(response.key).emit(message);
+	    map.get(response.key).emit('message', message);
 	})
     });
 });
