@@ -1,6 +1,6 @@
-
 var http = require('http');
 var fs = require('fs');
+var HashMap = require('hashmap').HashMap;
 
 var server = http.createServer(function(req, res){
 	    fs.readFile('./index.html', 'utf-8', function(error, content) {
@@ -9,6 +9,8 @@ var server = http.createServer(function(req, res){
     });
 });
 
+map = new HashMap();
+
 var io = require('socket.io').listen(server);
 
 io.sockets.on('connection', function(socket){
@@ -16,7 +18,13 @@ io.sockets.on('connection', function(socket){
     socket.on('userInfo', function(message){
 	console.log('data : ' + message);
 	var response = JSON.parse(message);
-	console.log(response.public[0]);
+	for (var i = 0; i < response.public.length; i++){
+	    map.set(response.public[i], socket);
+	}
+	socket.on('message', function(message){
+	    var response = JSON.parse(message);
+	    map.get(response.key).emit(message);
+	})
     });
 });
 
