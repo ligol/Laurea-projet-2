@@ -15,6 +15,8 @@ io.sockets.on('connection', function(socket){
     socket.emit('recept', 'data received');
     socket.on('userInfo', function(message){
 	console.log('data : ' + message);
+	var response = JSON.parse(message);
+	console.log(response.public[0]);
     });
 });
 
