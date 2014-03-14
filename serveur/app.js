@@ -25,6 +25,14 @@ io.sockets.on('connection', function(socket){
 	    var response = JSON.parse(message);
 	    map.get(response.key).emit('message', message);
 	})
+	socket.on('isConnected', function(message){
+	    var response = JSON.parse(message);
+	    if (map.get(response.key) == null)
+	    	socket.emit('isConnected', false);
+	    else
+	    	socket.emit('isConnected', true);
+	})
+
     });
 });
 
