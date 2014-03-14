@@ -1,7 +1,7 @@
 userInfo:
-{private: "user1", public: ["user2-1", "user3-2", "user4-1"]}
-{private: "user2", public: ["user1-1", "user3-2", "user4-1"]}
-{private: "user3", public: ["user2-1", "user1-2", "user4-1"]}
-{private: "user4", public: ["user2-1", "user3-2", "user1-1"]}
+{public: ["user1-1", "user1-2", "user1-3"]}
+{public: ["user2-1", "user2-2", "user2-3"]}
+{public: ["user3-1", "user3-2", "user3-3"]}
+{public: ["user4-1", "user4-2", "user4-3"]}
 message:
 {key: "user2-1", content: "Coucou je suis le user1"}
