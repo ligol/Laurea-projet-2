@@ -11,7 +11,7 @@ var server = http.createServer(function(req, res){
 
 var io = require('socket.io').listen(server);
 
-io.sockets.on('connection', function(socker){
+io.sockets.on('connection', function(socket){
     socket.emit('recept', 'data received');
     socket.on('userInfo', function(message){
 	console.log('data : ' + message);
