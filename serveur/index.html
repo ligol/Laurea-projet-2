@@ -13,9 +13,14 @@
         <script src="/socket.io/socket.io.js"></script>
         <script>
             var socket = io.connect('http://localhost:8080');
-            var pseudo = prompt('Envoyer HASH clé privé, clé publique!');
+            var pseudo = prompt('Envoyer HASH clé publique perso!');
             socket.emit('userInfo', pseudo);
+            var follow = prompt('Envoyer HASH clé publique follow!');
+            socket.emit('userFollow', follow);
             socket.on('recept', function(message) {
+                alert('Le serveur a un message pour vous : ' + message);
+            })
+            socket.on('connected', function(message) {
                 alert('Le serveur a un message pour vous : ' + message);
             })
             socket.on('message', function(message) {

@@ -10,18 +10,27 @@ var server = http.createServer(function(req, res){
 });
 
 map = new HashMap();
+follow = new HashMap();
 
 var io = require('socket.io').listen(server);
 
 io.sockets.on('connection', function(socket){
     socket.emit('recept', 'data received');
     socket.on('userInfo', function(message){
-	console.log('data : ' + message);
-	var response = JSON.parse(message);
-	for (var i = 0; i < response.public.length; i++){
-	    map.set(response.public[i], socket);
-	}
-	socket.on('message', function(message){
+		console.log('data : ' + message);
+		var response = JSON.parse(message);
+		for (var i = 0; i < response.public.length; i++){
+		    map.set(response.public[i], socket);
+		    if (follow.get(response.public[i]) != null) {
+		    	var client = follow.get(response.public[i]);
+		    	console.log('follow : ' + client);
+		    	for (var i = 0; i < client.length; i++) {
+		    		client[i].emit('connected', '{ \'user\':' + response.public[i] + ', \'state\':' + true);
+		    	};
+		    }
+		}
+    });
+    socket.on('message', function(message){
 	    var response = JSON.parse(message);
 	    map.get(response.key).emit('message', message);
 	})
@@ -32,8 +41,25 @@ io.sockets.on('connection', function(socket){
 	    else
 	    	socket.emit('isConnected', true);
 	})
-
-    });
+    socket.on('userFollow', function(message){
+		console.log('data : ' + message);
+		var response = JSON.parse(message);
+		for (var i = 0; i < response.public.length; i++) {
+			if (follow.get(response.public[i]) == null) {
+				var array = [];
+				array.push(socket);
+				follow.set(response.public[i], array);
+			}
+			else
+			{
+		    	follow.get(response.public[i]).push(socket);
+				socket.emit('connected', '{ \'user\':' + response.public[i] + ', \'state\':' + true);
+			}
+		}
+	});
+	socket.on('disconnect',function() {
+		console.log('Server has disconnected');
+	});
 });
 
 server.listen(8080);
