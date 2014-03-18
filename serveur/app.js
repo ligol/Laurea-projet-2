@@ -33,14 +33,14 @@ io.sockets.on('connection', function(socket){
     socket.on('message', function(message){
 	    var response = JSON.parse(message);
 	    map.get(response.key).emit('message', message);
-	})
+	});
 	socket.on('isConnected', function(message){
 	    var response = JSON.parse(message);
 	    if (map.get(response.key) == null)
 	    	socket.emit('isConnected', false);
 	    else
 	    	socket.emit('isConnected', true);
-	})
+	});
     socket.on('userFollow', function(message){
 		console.log('data : ' + message);
 		var response = JSON.parse(message);
