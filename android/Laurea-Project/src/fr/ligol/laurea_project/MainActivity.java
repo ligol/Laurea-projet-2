@@ -11,6 +11,7 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -64,7 +65,8 @@ public class MainActivity extends ActionBarActivity {
             for (Contact c : contact) {
                 id.add(c.getHisHash());
             }
-            userFollow.put("id", id);
+            JSONArray a = new JSONArray(id);
+            userFollow.put("id", a);
         } catch (JSONException e) {
             e.printStackTrace();
         }

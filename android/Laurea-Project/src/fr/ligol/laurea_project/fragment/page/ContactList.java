@@ -6,6 +6,7 @@ import fr.ligol.laurea_project.MainActivity;
 import fr.ligol.laurea_project.adapter.ContactAdapter;
 import fr.ligol.laurea_project.fragment.AListFragment;
 import fr.ligol.laurea_project.listener.OnNewConnectionListener;
+import fr.ligol.laurea_project.model.Contact;
 
 public class ContactList extends AListFragment {
 
@@ -20,6 +21,11 @@ public class ContactList extends AListFragment {
                     @Override
                     public void newConnection(String user, boolean state) {
                         Log.d("listener", user + " " + state);
+                        for (Contact c : activity.contact) {
+                            if (c.getHisHash().equals(user) == true) {
+                                c.setConnected(state);
+                            }
+                        }
                         activity.runOnUiThread(dataChanged);
                     }
                 });

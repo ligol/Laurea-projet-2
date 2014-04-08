@@ -8,3 +8,4 @@ message:
 
 userFollow
 {"id": ["user2-1", "user3-2", "user4-3"]}
+{"id": ["toto"]}
