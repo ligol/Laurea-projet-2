@@ -7,4 +7,4 @@ message:
 {"key": "user2-1", "content": "Coucou je suis le user1"}
 
 userFollow
-{"public": ["user2-1", "user3-2", "user4-3"]}
+{"id": ["user2-1", "user3-2", "user4-3"]}

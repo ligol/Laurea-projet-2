@@ -36,15 +36,15 @@ io.sockets.on('connection', function(socket){
 	console.log('data : ' + message);
 	var response = JSON.parse(message);
 	for (var i = 0; i < response.id.length; i++) {
-	    if (follow.get(response.id) == null) {
+	    if (follow.get(response.id[i]) == null) {
 		var array = [];
 		array.push(socket);
-		follow.set(response.id, array);
+		follow.set(response.id[i], array);
 	    }
 	    else
 	    {
-		follow.get(response.id).push(socket);
-		socket.emit('connected', '{ \'user\':' + response.id + ', \'state\':' + true);
+		follow.get(response.id[i]).push(socket);
+		socket.emit('connected', '{ \'user\':' + response.id[i] + ', \'state\':' + true + "}");
 	    }
 	}
     });
