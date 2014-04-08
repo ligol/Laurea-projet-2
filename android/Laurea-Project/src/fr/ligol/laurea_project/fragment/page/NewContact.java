@@ -16,10 +16,10 @@ import fr.ligol.laurea_project.model.Contact;
 
 public class NewContact extends AFragment {
     private EditText login;
-    private EditText myKey;
+    private EditText hisHash;
     private EditText hisKey;
-    private Button copy;
-    private Button paste;
+    private Button pasteHash;
+    private Button pasteKey;
     private Button valid;
 
     @Override
@@ -34,13 +34,11 @@ public class NewContact extends AFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         login = (EditText) getView().findViewById(R.id.login);
-        myKey = (EditText) getView().findViewById(R.id.mykey);
+        hisHash = (EditText) getView().findViewById(R.id.hishash);
         hisKey = (EditText) getView().findViewById(R.id.hiskey);
-        copy = (Button) getView().findViewById(R.id.copy);
-        paste = (Button) getView().findViewById(R.id.paste);
+        pasteHash = (Button) getView().findViewById(R.id.copy);
+        pasteKey = (Button) getView().findViewById(R.id.paste);
         valid = (Button) getView().findViewById(R.id.valid);
-
-        myKey.setText("toto");
 
         valid.setOnClickListener(new OnClickListener() {
 
@@ -49,24 +47,24 @@ public class NewContact extends AFragment {
                 Contact c = new Contact();
                 c.setName(login.getText().toString());
                 c.setHisPublicKey(hisKey.getText().toString());
-                c.setMyPublicKey(myKey.getText().toString());
+                c.setHisHash(hisHash.getText().toString());
                 c.save();
                 FragmentManager fm = getActivity().getSupportFragmentManager();
                 fm.popBackStack();
                 getActivity().supportInvalidateOptionsMenu();
             }
         });
-        copy.setOnClickListener(new OnClickListener() {
+        pasteHash.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
                 ClipboardManager cm = (ClipboardManager) getActivity()
                         .getSystemService(Context.CLIPBOARD_SERVICE);
-                cm.setText(myKey.getText().toString());
+                hisHash.setText(cm.getText());
             }
         });
-        paste.setOnClickListener(new OnClickListener() {
+        pasteKey.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {

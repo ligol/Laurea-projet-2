@@ -9,5 +9,6 @@
     <string name="paste">Paste</string>
     <string name="hiskey">Paste his key here</string>
     <string name="valid">Validate</string>
+    <string name="hishash">Past his Hash here</string>
 
 </resources>

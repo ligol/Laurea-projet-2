@@ -1108,6 +1108,7 @@ containing a value of this type.
         public static final int end=0x7f050013;
         public static final int expand_activities_button=0x7f050026;
         public static final int expanded_menu=0x7f05002c;
+        public static final int hishash=0x7f05003f;
         public static final int hiskey=0x7f050041;
         public static final int home=0x7f050014;
         public static final int homeAsUp=0x7f050005;
@@ -1118,7 +1119,6 @@ containing a value of this type.
         public static final int list_item=0x7f050029;
         public static final int login=0x7f05003e;
         public static final int middle=0x7f050012;
-        public static final int mykey=0x7f05003f;
         public static final int never=0x7f050009;
         public static final int none=0x7f050010;
         public static final int normal=0x7f050000;
@@ -1252,6 +1252,7 @@ containing a value of this type.
         public static final int app_name=0x7f0a000d;
         public static final int copy=0x7f0a0010;
         public static final int hello_world=0x7f0a000e;
+        public static final int hishash=0x7f0a0015;
         public static final int hiskey=0x7f0a0013;
         public static final int login=0x7f0a0011;
         public static final int paste=0x7f0a0012;

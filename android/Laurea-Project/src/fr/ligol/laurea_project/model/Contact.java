@@ -4,7 +4,7 @@ import com.orm.SugarRecord;
 
 public class Contact extends SugarRecord<Contact> {
     private String name;
-    private String myPublicKey;
+    private String hisHash;
     private String hisPublicKey;
 
     public String getName() {
@@ -15,12 +15,12 @@ public class Contact extends SugarRecord<Contact> {
         this.name = name;
     }
 
-    public String getMyPublicKey() {
-        return myPublicKey;
+    public String getHisHash() {
+        return hisHash;
     }
 
-    public void setMyPublicKey(String myPublicKey) {
-        this.myPublicKey = myPublicKey;
+    public void setHisHash(String hisHash) {
+        this.hisHash = hisHash;
     }
 
     public String getHisPublicKey() {
