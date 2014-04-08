@@ -4,10 +4,8 @@ import fr.ligol.laurea_project.fragment.page.ContactList;
 import fr.ligol.laurea_project.fragment.page.NewContact;
 import fr.ligol.laurea_project.model.Contact;
 import fr.ligol.laurea_project.util.RSAUtils;
-import io.socket.IOAcknowledge;
-import io.socket.IOCallback;
+import fr.ligol.laurea_project.util.SocketIOCallback;
 import io.socket.SocketIO;
-import io.socket.SocketIOException;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -29,15 +27,19 @@ import android.view.MenuItem;
 
 public class MainActivity extends ActionBarActivity {
     private SocketIO socket;
+    public List<Contact> contact;
+    private final ContactList listFragment = new ContactList();
+    public final SocketIOCallback socketIOCallback = new SocketIOCallback();
 
     @SuppressLint("TrulyRandom")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        contact = Contact.listAll(Contact.class);
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new ContactList()).commit();
+                    .add(R.id.container, listFragment).commit();
             supportInvalidateOptionsMenu();
         }
         SharedPreferences sp = getSharedPreferences("laurea_project",
@@ -59,7 +61,7 @@ public class MainActivity extends ActionBarActivity {
             userInfo.put("id",
                     RSAUtils.getPrivateKeyHash(getApplicationContext()));
             List<String> id = new ArrayList<String>();
-            for (Contact c : Contact.listAll(Contact.class)) {
+            for (Contact c : contact) {
                 id.add(c.getHisHash());
             }
             userFollow.put("id", id);
@@ -73,42 +75,7 @@ public class MainActivity extends ActionBarActivity {
             e.printStackTrace();
         }
         Log.d("tet3", socket.toString());
-        socket.connect(new IOCallback() {
-            @Override
-            public void onMessage(JSONObject json, IOAcknowledge ack) {
-                try {
-                    System.out.println("Server said:" + json.toString(2));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onMessage(String data, IOAcknowledge ack) {
-                System.out.println("Server said: " + data);
-            }
-
-            @Override
-            public void onError(SocketIOException socketIOException) {
-                System.out.println("an Error occured");
-                socketIOException.printStackTrace();
-            }
-
-            @Override
-            public void onDisconnect() {
-                System.out.println("Connection terminated.");
-            }
-
-            @Override
-            public void onConnect() {
-                System.out.println("Connection established");
-            }
-
-            @Override
-            public void on(String event, IOAcknowledge ack, Object... args) {
-                System.out.println("Server triggered event '" + event + "'");
-            }
-        });
+        socket.connect(socketIOCallback);
 
         socket.emit("userInfo", userInfo.toString());
         socket.emit("userFollow", userFollow.toString());
