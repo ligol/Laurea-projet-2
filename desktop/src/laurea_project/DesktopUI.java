@@ -1,8 +1,8 @@
-package my.test;
+package laurea_project;
 
 import javax.swing.JFrame;
 
-public class TestUI {
+public class DesktopUI {
 
 	public static void main(String[] args) {
 		// TODO Instancier une JFrame
