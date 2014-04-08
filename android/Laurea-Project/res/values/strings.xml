@@ -4,5 +4,10 @@
     <string name="app_name">Laurea-Project</string>
     <string name="hello_world">Hello world!</string>
     <string name="add_contact">New Contact</string>
+    <string name="copy">Copy</string>
+    <string name="login">Login</string>
+    <string name="paste">Paste</string>
+    <string name="hiskey">Paste his key here</string>
+    <string name="valid">Validate</string>
 
 </resources>
