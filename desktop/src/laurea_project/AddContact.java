@@ -3,6 +3,7 @@ package laurea_project;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,24 +17,31 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 
-public class AddContact extends JDialog {
+public class AddContact extends JDialog implements ActionListener {
 
 	private final JPanel contentPanel = new JPanel();
 	private JTextField tfNickname;
 	private JLabel lblNickname;
-	private JTextField tfhash;
+	private JTextField tfHash;
 	private JTextField tfPublicKey;
 	private JLabel lblHash;
 	private JLabel lblPublicKey;
+	private String nickname;
+	private String hash;
+	private String publickey;
+	private JButton okButton;
+
 
 	/**
 	 * Create the dialog.
 	 */
-	public AddContact() {
+	AddContact(Frame parentFrame) {
+		super(parentFrame, "Add a new Contact", true);
 		setType(Type.POPUP);
-		setTitle("Add a new Contact");
 		setResizable(false);
 		setAlwaysOnTop(true);
+		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		setLocationRelativeTo(parentFrame);	// window center
 		setBounds(100, 100, 300, 150);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -56,10 +64,10 @@ public class AddContact extends JDialog {
 			contentPanel.add(lblHash);
 		}
 		{
-			tfhash = new JTextField();
-			lblHash.setLabelFor(tfhash);
-			contentPanel.add(tfhash);
-			tfhash.setColumns(10);
+			tfHash = new JTextField();
+			lblHash.setLabelFor(tfHash);
+			contentPanel.add(tfHash);
+			tfHash.setColumns(10);
 		}
 		{
 			lblPublicKey = new JLabel("Public key");
@@ -78,22 +86,48 @@ public class AddContact extends JDialog {
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
-				JButton okButton = new JButton("Add");
+				okButton = new JButton("Add");
 				okButton.setActionCommand("OK");
+				okButton.addActionListener(this);
 				buttonPane.add(okButton);
 				getRootPane().setDefaultButton(okButton);
 			}
 			{
 				JButton cancelButton = new JButton("Cancel");
-				cancelButton.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						dispose();
-					}
-				});
+				cancelButton.addActionListener(this);
 				cancelButton.setActionCommand("Cancel");
 				buttonPane.add(cancelButton);
 			}
 		}
+		setVisible(true);
+	}
+
+	public String getNickname() {
+		return nickname;
+	}
+
+	public String getHash() {
+		return hash;
+	}
+
+	public String getPublicKey() {
+		return publickey;
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == okButton) {
+			nickname = tfNickname.getText();
+			hash = tfHash.getText();
+			publickey = tfPublicKey.getText();
+		} else {
+			nickname = null;
+			hash = null;
+			publickey = null;
+		}
+		setVisible(false);
+		dispose();
+
 	}
 
 }
