@@ -14,8 +14,9 @@
         <script>
             var socket = io.connect('http://ligol.fr:8080');
             var pseudo = prompt('Envoyer HASH clé publique perso!');
-
-            socket.emit('userInfo', "{\"id\": \""+pseudo+"\"}");
+            socket.emit('userInfo', "{\"id\" : \"" + pseudo +"\"}");
+/*            var follow = prompt('Envoyer HASH clé publique follow!');
+            socket.emit('userFollow', follow);*/
             socket.on('recept', function(message) {
                 alert('Le serveur a un message pour vous : ' + message);
             })
@@ -27,7 +28,7 @@
             })
             $('#poke').click(function () {
                 var message = prompt('Votre message:');
-                socket.emit('disconnected', "{\"id\": \""+pseudo+"\"}");
+                socket.emit('message', message);
             })
         </script>
     </body>

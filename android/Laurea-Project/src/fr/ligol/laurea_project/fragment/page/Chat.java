@@ -2,12 +2,14 @@ package fr.ligol.laurea_project.fragment.page;
 
 import io.socket.SocketIO;
 
+import java.net.URLEncoder;
 import java.util.List;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -46,10 +48,11 @@ public class Chat extends AListFragment {
 
                     @Override
                     public void onMessage() {
+                        Log.d("message", "reload");
                         List<Message> m = Message.find(Message.class,
                                 "contact = ?", contact.getId().toString());
                         ((ChatAdapter) getListAdapter()).update(m);
-                        ((ChatAdapter) getListAdapter()).notifyDataSetChanged();
+                        getActivity().runOnUiThread(dataChanged);
                     }
                 });
         contact = Contact.findById(Contact.class, getArguments().getLong("id"));
@@ -60,6 +63,7 @@ public class Chat extends AListFragment {
         send = (Button) getView().findViewById(R.id.send);
         message = (EditText) getView().findViewById(R.id.message);
         send.setOnClickListener(new OnClickListener() {
+            @SuppressWarnings("deprecation")
             @Override
             public void onClick(View v) {
                 Message newMessage = new Message();
@@ -72,8 +76,9 @@ public class Chat extends AListFragment {
                 ((ChatAdapter) getListAdapter()).notifyDataSetChanged();
                 JSONObject o = new JSONObject();
                 try {
-                    o.put("id", contact.getName());
-                    o.put("sender", RSAUtils.getPublicKeyHash(getActivity()));
+                    o.put("id", URLEncoder.encode(contact.getHisHash()));
+                    o.put("sender", URLEncoder.encode(RSAUtils
+                            .getPublicKeyHash(getActivity())));
                     o.put("content", message.getText().toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -83,4 +88,12 @@ public class Chat extends AListFragment {
             }
         });
     }
+
+    protected Runnable dataChanged = new Runnable() {
+        @Override
+        public void run() {
+            ChatAdapter c = (ChatAdapter) getListAdapter();
+            c.notifyDataSetChanged();
+        }
+    };
 }

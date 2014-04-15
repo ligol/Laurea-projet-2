@@ -16,10 +16,12 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Base64;
+import android.util.Log;
 
 public class RSAUtils {
     @SuppressLint("TrulyRandom")
     public static void generatePrivateKey(Context c) {
+        Log.d("printkey", "generate");
         KeyPairGenerator kpg;
         SharedPreferences sp = c.getSharedPreferences("laurea_project",
                 Context.MODE_PRIVATE);
@@ -34,7 +36,7 @@ public class RSAUtils {
                     .getEncoded(), Base64.DEFAULT);
             sp.edit().putString("priv", privateK).commit();
             sp.edit().putString("pub", publicK).commit();
-            sp.edit().putBoolean("private", true);
+            sp.edit().putBoolean("private", true).commit();
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
@@ -46,8 +48,7 @@ public class RSAUtils {
             SharedPreferences sp = c.getSharedPreferences("laurea_project",
                     Context.MODE_PRIVATE);
             String privateK = sp.getString("priv", null);
-            byte[] keyBytes = Base64.decode(privateK.getBytes("utf-8"),
-                    Base64.DEFAULT);
+            byte[] keyBytes = Base64.decode(privateK, Base64.DEFAULT);
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
             KeyFactory fact = KeyFactory.getInstance("RSA");
             PrivateKey priv = fact.generatePrivate(keySpec);
@@ -66,11 +67,15 @@ public class RSAUtils {
             SharedPreferences sp = c.getSharedPreferences("laurea_project",
                     Context.MODE_PRIVATE);
             String publicK = sp.getString("pub", null);
-            byte[] keyBytes = Base64.decode(publicK.getBytes("utf-8"),
-                    Base64.DEFAULT);
+            // Log.d("printkey", publicK.replace("\n", "+"));
+            byte[] keyBytes = Base64.decode(publicK, Base64.DEFAULT);
+            // Log.d("printkey2", new String(keyBytes).replace("\n", "+"));
             X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             PublicKey key = keyFactory.generatePublic(spec);
+            // Log.d("printkey", keyFactory
+            // .getKeySpec(key, RSAPublicKeySpec.class).getModulus()
+            // .toString());
             return key;
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
@@ -95,7 +100,10 @@ public class RSAUtils {
     public static String getPublicKeyHash(Context c) {
         try {
             PublicKey priv = getPublicKey(c);
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            // Log.d("test key2",
+            // Base64.encodeToString(priv.getEncoded(), Base64.DEFAULT)
+            // .replace("\n", "+"));
+            MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(priv.getEncoded());
             return Base64.encodeToString(md.digest(), Base64.DEFAULT);
         } catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
@@ -104,4 +112,21 @@ public class RSAUtils {
         return null;
     }
 
+    public static String getPublicKeyHash(String c) {
+        try {
+            String publicK = c;
+            byte[] keyBytes = Base64.decode(publicK, Base64.DEFAULT);
+            X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PublicKey priv = keyFactory.generatePublic(spec);
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(priv.getEncoded());
+            return Base64.encodeToString(md.digest(), Base64.DEFAULT);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

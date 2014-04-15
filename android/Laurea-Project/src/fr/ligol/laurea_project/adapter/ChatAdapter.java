@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,7 +52,7 @@ public class ChatAdapter extends BaseAdapter {
             colorPosition = bgColors[1];
         }
 
-        convertView.setBackgroundColor(bgColors[colorPosition]);
+        convertView.setBackgroundColor(colorPosition);
         holder.tvName.setText(biblio.get(position).getMessage());
         return convertView;
     }
@@ -72,6 +73,8 @@ public class ChatAdapter extends BaseAdapter {
     }
 
     public void update(List<Message> list) {
+        Log.d("message count", biblio.size() + "");
+        Log.d("message count", list.size() + "");
         biblio.clear();
         biblio.addAll(list);
     }

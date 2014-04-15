@@ -1,5 +1,7 @@
 package fr.ligol.laurea_project.fragment.page;
 
+import java.net.URLEncoder;
+
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -28,7 +30,7 @@ public class ContactList extends AListFragment {
                     public void newConnection(String user, boolean state) {
                         Log.d("listener", user + " " + state);
                         for (Contact c : activity.contact) {
-                            if (c.getHisHash().equals(user) == true) {
+                            if (URLEncoder.encode(c.getHisHash()).equals(user) == true) {
                                 c.setConnected(state);
                             }
                         }
@@ -39,7 +41,7 @@ public class ContactList extends AListFragment {
                     public void newDisconnetion(String user, boolean state) {
                         Log.d("listener", user + " " + state);
                         for (Contact c : activity.contact) {
-                            if (c.getHisHash().equals(user) == true) {
+                            if (URLEncoder.encode(c.getHisHash()).equals(user) == true) {
                                 c.setConnected(state);
                             }
                         }
