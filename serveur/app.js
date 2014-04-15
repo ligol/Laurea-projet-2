@@ -19,41 +19,32 @@ io.sockets.on('connection', function(socket){
     socket.on('userInfo', function(message){
 	console.log('data : ' + message);
 	var response = JSON.parse(message);
-	for (var i = 0; i < response.public.length; i++){
-	    map.set(response.public[i], socket);
-	    if (follow.get(response.public[i]) != null) {
-		var client = follow.get(response.public[i]);
-		console.log('follow : ' + client);
-		for (var i = 0; i < client.length; i++) {
-		    client[i].emit('connected', '{ \'user\':' + response.public[i] + ', \'state\':' + true);
-		};
-	    }
+	map.set(response.id, socket);
+	if (follow.get(response.id) != null) {
+	    var client = follow.get(response.id);
+	    console.log('follow : ' + client);
+	    for (var i = 0; i < client.length; i++) {
+		client[i].emit('connected', '{ \'user\':' + response.id + ', \'state\':' + true);
+	    };
 	}
     });
     socket.on('message', function(message){
 	var response = JSON.parse(message);
 	map.get(response.key).emit('message', message);
     });
-    socket.on('isConnected', function(message){
-	var response = JSON.parse(message);
-	if (map.get(response.key) == null)
-	    socket.emit('isConnected', false);
-	else
-	    socket.emit('isConnected', true);
-    });
     socket.on('userFollow', function(message){
 	console.log('data : ' + message);
 	var response = JSON.parse(message);
-	for (var i = 0; i < response.public.length; i++) {
-	    if (follow.get(response.public[i]) == null) {
+	for (var i = 0; i < response.id.length; i++) {
+	    if (follow.get(response.id[i]) == null) {
 		var array = [];
 		array.push(socket);
-		follow.set(response.public[i], array);
+		follow.set(response.id[i], array);
 	    }
 	    else
 	    {
-		follow.get(response.public[i]).push(socket);
-		socket.emit('connected', '{ \'user\':' + response.public[i] + ', \'state\':' + true);
+		follow.get(response.id[i]).push(socket);
+		socket.emit('connected', '{ \'user\':' + response.id[i] + ', \'state\':' + true + "}");
 	    }
 	}
     });
@@ -68,13 +59,11 @@ io.sockets.on('connection', function(socket){
 	    }
 	});
 	var response = JSON.parse(message);
-	for (var i = 0; i < response.public.length; i++){
-	    if (follow.get(response.public[i]) != null) {
-		var client = follow.get(response.public[i]);
-		for (var i = 0; i < client.length; i++) {
-		    client[i].emit('disconnected', '{ \'user\':' + response.public[i] + ', \'state\':' + true);
-		};
-	    }
+	if (follow.get(response.id) != null) {
+	    var client = follow.get(response.id);
+	    for (var i = 0; i < client.length; i++) {
+		client[i].emit('disconnected', '{ \'user\':' + response.id + ', \'state\':' + true);
+	    };
 	}
     });
 });

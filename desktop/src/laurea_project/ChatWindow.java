@@ -1,4 +1,4 @@
-package laurea_project.windows;
+package laurea_project;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

@@ -7,7 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
+import fr.ligol.laurea_project.R;
 import fr.ligol.laurea_project.model.Contact;
 
 public class ContactAdapter extends BaseAdapter {
@@ -24,6 +26,7 @@ public class ContactAdapter extends BaseAdapter {
 
     private class ViewHolder {
         TextView tvName;
+        ImageView imgState;
     }
 
     @Override
@@ -31,10 +34,9 @@ public class ContactAdapter extends BaseAdapter {
         ViewHolder holder;
         if (convertView == null) {
             holder = new ViewHolder();
-            convertView = inflater.inflate(android.R.layout.simple_list_item_1,
-                    null);
-            holder.tvName = (TextView) convertView
-                    .findViewById(android.R.id.text1);
+            convertView = inflater.inflate(R.layout.contact_item, null);
+            holder.tvName = (TextView) convertView.findViewById(R.id.login);
+            holder.imgState = (ImageView) convertView.findViewById(R.id.state);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -43,6 +45,13 @@ public class ContactAdapter extends BaseAdapter {
         final int colorPosition = position % bgColors.length;
         convertView.setBackgroundColor(bgColors[colorPosition]);
         holder.tvName.setText(biblio.get(position).getName());
+        if (biblio.get(position).isConnected() == true) {
+            holder.imgState
+                    .setImageResource(android.R.drawable.presence_online);
+        } else {
+            holder.imgState
+                    .setImageResource(android.R.drawable.presence_invisible);
+        }
         return convertView;
     }
 

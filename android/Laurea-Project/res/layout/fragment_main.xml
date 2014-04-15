@@ -21,11 +21,11 @@
     </EditText>
 
     <EditText
-        android:id="@+id/mykey"
+        android:id="@+id/hishash"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:enabled="false"
+        android:hint="@string/hishash"
         android:inputType="textMultiLine" >
 
     </EditText>
@@ -34,7 +34,7 @@
         android:id="@+id/copy"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/copy" />
+        android:text="@string/paste" />
 
     <EditText
         android:id="@+id/hiskey"

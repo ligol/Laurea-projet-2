@@ -1,11 +1,14 @@
 package fr.ligol.laurea_project.model;
 
 import com.orm.SugarRecord;
+import com.orm.dsl.Ignore;
 
 public class Contact extends SugarRecord<Contact> {
     private String name;
-    private String myPublicKey;
+    private String hisHash;
     private String hisPublicKey;
+    @Ignore
+    private boolean isConnected = false;
 
     public String getName() {
         return name;
@@ -15,12 +18,12 @@ public class Contact extends SugarRecord<Contact> {
         this.name = name;
     }
 
-    public String getMyPublicKey() {
-        return myPublicKey;
+    public String getHisHash() {
+        return hisHash;
     }
 
-    public void setMyPublicKey(String myPublicKey) {
-        this.myPublicKey = myPublicKey;
+    public void setHisHash(String hisHash) {
+        this.hisHash = hisHash;
     }
 
     public String getHisPublicKey() {
@@ -29,5 +32,13 @@ public class Contact extends SugarRecord<Contact> {
 
     public void setHisPublicKey(String hisPublicKey) {
         this.hisPublicKey = hisPublicKey;
+    }
+
+    public boolean isConnected() {
+        return isConnected;
+    }
+
+    public void setConnected(boolean isConnected) {
+        this.isConnected = isConnected;
     }
 }
