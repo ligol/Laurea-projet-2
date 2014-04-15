@@ -1,7 +1,6 @@
 package fr.ligol.laurea_project;
 
 import fr.ligol.laurea_project.fragment.page.ContactList;
-import fr.ligol.laurea_project.fragment.page.NewContact;
 import fr.ligol.laurea_project.model.Contact;
 import fr.ligol.laurea_project.util.RSAUtils;
 import fr.ligol.laurea_project.util.SocketIOCallback;
@@ -20,11 +19,9 @@ import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 
 public class MainActivity extends ActionBarActivity {
@@ -42,7 +39,6 @@ public class MainActivity extends ActionBarActivity {
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, listFragment).commit();
-            supportInvalidateOptionsMenu();
         }
         SharedPreferences sp = getSharedPreferences("laurea_project",
                 MODE_PRIVATE);
@@ -88,8 +84,8 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu items for use in the action bar
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main, menu);
+        // MenuInflater inflater = getMenuInflater();
+        // inflater.inflate(R.menu.main, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -101,34 +97,25 @@ public class MainActivity extends ActionBarActivity {
             FragmentManager fm = getSupportFragmentManager();
             if (fm.getBackStackEntryCount() > 0) {
                 fm.popBackStack();
-                supportInvalidateOptionsMenu();
             }
-            return true;
-        case R.id.add_contact:
-            supportInvalidateOptionsMenu();
-            FragmentTransaction ft = getSupportFragmentManager()
-                    .beginTransaction();
-            ft.replace(R.id.container, new NewContact());
-            ft.addToBackStack(null);
-            ft.commit();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        FragmentManager fm = getSupportFragmentManager();
-        if (fm.getBackStackEntryCount() == 0) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-            menu.findItem(R.id.add_contact).setVisible(true);
-        } else {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            menu.findItem(R.id.add_contact).setVisible(false);
-        }
-
-        return true;
-    }
+    // @Override
+    // public boolean onPrepareOptionsMenu(Menu menu) {
+    // FragmentManager fm = getSupportFragmentManager();
+    // if (fm.getBackStackEntryCount() == 0) {
+    // getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+    // menu.findItem(R.id.add_contact).setVisible(true);
+    // } else {
+    // getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    // menu.findItem(R.id.add_contact).setVisible(false);
+    // }
+    //
+    // return true;
+    // }
 
     @Override
     public void onBackPressed() {
@@ -144,6 +131,7 @@ public class MainActivity extends ActionBarActivity {
         this.socket = socket;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onDestroy() {
         JSONObject userInfo = new JSONObject();

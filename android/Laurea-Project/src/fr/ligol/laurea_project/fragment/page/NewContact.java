@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.ActionBarActivity;
 import android.text.ClipboardManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,6 +36,8 @@ public class NewContact extends AFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        ((ActionBarActivity) getActivity()).getSupportActionBar()
+                .setDisplayHomeAsUpEnabled(true);
         login = (EditText) getView().findViewById(R.id.login);
         hisHash = (EditText) getView().findViewById(R.id.hishash);
         hisKey = (EditText) getView().findViewById(R.id.hiskey);
