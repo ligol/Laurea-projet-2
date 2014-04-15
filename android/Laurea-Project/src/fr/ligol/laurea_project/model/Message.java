@@ -6,6 +6,7 @@ public class Message extends SugarRecord<Message> {
     private boolean me;
     private boolean read = false;
     private String message;
+    private Contact contact;
 
     public boolean isMe() {
         return me;
@@ -29,5 +30,13 @@ public class Message extends SugarRecord<Message> {
 
     public void setRead(boolean read) {
         this.read = read;
+    }
+
+    public Contact getContact() {
+        return contact;
+    }
+
+    public void setContact(Contact contact) {
+        this.contact = contact;
     }
 }

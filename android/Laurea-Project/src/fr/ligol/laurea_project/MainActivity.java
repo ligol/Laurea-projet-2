@@ -132,4 +132,12 @@ public class MainActivity extends ActionBarActivity {
         supportInvalidateOptionsMenu();
         super.onBackPressed();
     }
+
+    public SocketIO getSocket() {
+        return socket;
+    }
+
+    public void setSocket(SocketIO socket) {
+        this.socket = socket;
+    }
 }

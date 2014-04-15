@@ -1,5 +1,6 @@
 package fr.ligol.laurea_project.adapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
@@ -18,6 +19,9 @@ public class ChatAdapter extends BaseAdapter {
 
     public ChatAdapter(Context context, List<Message> biblio) {
         inflater = LayoutInflater.from(context);
+        if (biblio == null) {
+            biblio = new ArrayList<Message>();
+        }
         this.biblio = biblio;
         this.context = context;
     }
@@ -40,7 +44,13 @@ public class ChatAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
 
         }
-        final int colorPosition = position % bgColors.length;
+        int colorPosition;
+        if (biblio.get(position).isMe()) {
+            colorPosition = bgColors[0];
+        } else {
+            colorPosition = bgColors[1];
+        }
+
         convertView.setBackgroundColor(bgColors[colorPosition]);
         holder.tvName.setText(biblio.get(position).getMessage());
         return convertView;
@@ -64,5 +74,9 @@ public class ChatAdapter extends BaseAdapter {
     public void update(List<Message> list) {
         biblio.clear();
         biblio.addAll(list);
+    }
+
+    public void add(Message m) {
+        biblio.add(m);
     }
 }
