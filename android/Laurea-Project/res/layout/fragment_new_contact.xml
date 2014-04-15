@@ -1,58 +1,63 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/LinearLayout1"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="fr.ligol.laurea_project.MainActivity$PlaceholderFragment" >
+    android:layout_height="wrap_content" >
 
-    <EditText
-        android:id="@+id/login"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="@string/login"
-        android:inputType="textPersonName" >
-        <requestFocus />
-    </EditText>
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        tools:context="fr.ligol.laurea_project.MainActivity$PlaceholderFragment" >
 
-    <EditText
-        android:id="@+id/hishash"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="@string/hishash"
-        android:inputType="textMultiLine" >
+        <EditText
+            android:id="@+id/login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/login"
+            android:inputType="textPersonName" >
 
-    </EditText>
+            <requestFocus />
+        </EditText>
 
-    <Button
-        android:id="@+id/copy"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/paste" />
+        <EditText
+            android:id="@+id/hiskey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/hiskey"
+            android:inputType="textMultiLine" >
+        </EditText>
 
-    <EditText
-        android:id="@+id/hiskey"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="@string/hiskey" />
+        <Button
+            android:id="@+id/paste"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/paste" />
 
-    <Button
-        android:id="@+id/paste"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/paste" />
+        <EditText
+            android:id="@+id/hishash"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:enabled="false"
+            android:hint="@string/hishash" />
 
-    <Button
-        android:id="@+id/valid"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/valid" />
+        <Button
+            android:id="@+id/copy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/copy" />
 
-</LinearLayout>
+        <Button
+            android:id="@+id/valid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/valid" />
+    </LinearLayout>
+
+</ScrollView>

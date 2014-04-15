@@ -254,7 +254,7 @@ int id beginning 0x7f050011
 int id checkbox 0x7f05002d
 int id collapseActionView 0x7f05000d
 int id container 0x7f05003c
-int id copy 0x7f050043
+int id copy 0x7f050045
 int id default_activity_button 0x7f050028
 int id dialog 0x7f05000e
 int id disableHome 0x7f050008
@@ -263,8 +263,8 @@ int id edit_query 0x7f050030
 int id end 0x7f050013
 int id expand_activities_button 0x7f050026
 int id expanded_menu 0x7f05002c
-int id hishash 0x7f050042
-int id hiskey 0x7f050044
+int id hishash 0x7f050044
+int id hiskey 0x7f050042
 int id home 0x7f050014
 int id homeAsUp 0x7f050005
 int id icon 0x7f05002a
@@ -278,7 +278,7 @@ int id middle 0x7f050012
 int id never 0x7f050009
 int id none 0x7f050010
 int id normal 0x7f050000
-int id paste 0x7f050045
+int id paste 0x7f050043
 int id progress_circular 0x7f050018
 int id progress_horizontal 0x7f050019
 int id radio 0x7f05002f
