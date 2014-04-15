@@ -18,8 +18,11 @@ import fr.ligol.laurea_project.MainActivity;
 import fr.ligol.laurea_project.R;
 import fr.ligol.laurea_project.adapter.ChatAdapter;
 import fr.ligol.laurea_project.fragment.AListFragment;
+import fr.ligol.laurea_project.listener.OnContactChatListener;
 import fr.ligol.laurea_project.model.Contact;
 import fr.ligol.laurea_project.model.Message;
+import fr.ligol.laurea_project.util.RSAUtils;
+import fr.ligol.laurea_project.util.SocketIOCallback;
 
 public class Chat extends AListFragment {
     private Contact contact;
@@ -38,6 +41,17 @@ public class Chat extends AListFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        SocketIOCallback.getInstance().setNewChatListener(
+                new OnContactChatListener() {
+
+                    @Override
+                    public void onMessage() {
+                        List<Message> m = Message.find(Message.class,
+                                "contact = ?", contact.getId().toString());
+                        ((ChatAdapter) getListAdapter()).update(m);
+                        ((ChatAdapter) getListAdapter()).notifyDataSetChanged();
+                    }
+                });
         contact = Contact.findById(Contact.class, getArguments().getLong("id"));
         socket = ((MainActivity) getActivity()).getSocket();
         List<Message> m = Message.find(Message.class, "contact = ?", contact
@@ -59,6 +73,7 @@ public class Chat extends AListFragment {
                 JSONObject o = new JSONObject();
                 try {
                     o.put("id", contact.getName());
+                    o.put("sender", RSAUtils.getPublicKeyHash(getActivity()));
                     o.put("content", message.getText().toString());
                 } catch (JSONException e) {
                     e.printStackTrace();

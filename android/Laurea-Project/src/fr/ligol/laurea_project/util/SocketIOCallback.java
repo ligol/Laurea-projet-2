@@ -2,6 +2,8 @@ package fr.ligol.laurea_project.util;
 
 import fr.ligol.laurea_project.listener.OnContactChatListener;
 import fr.ligol.laurea_project.listener.OnContactListListener;
+import fr.ligol.laurea_project.model.Contact;
+import fr.ligol.laurea_project.model.Message;
 import io.socket.IOAcknowledge;
 import io.socket.IOCallback;
 import io.socket.SocketIOException;
@@ -56,6 +58,16 @@ public class SocketIOCallback implements IOCallback {
             if (newListListener != null) {
                 try {
                     JSONObject o = new JSONObject((String) param[0]);
+                    Message m = new Message();
+                    Contact contact = Contact.find(Contact.class,
+                            "hisHash = ?", o.getString("sender")).get(0);
+                    m.setContact(contact);
+                    m.setMe(false);
+                    m.setMessage(o.getString("content"));
+                    m.save();
+                    if (newChatListener != null) {
+                        newChatListener.onMessage();
+                    }
                     newListListener.newDisconnetion(o.getString("user"),
                             o.getBoolean("state"));
                 } catch (JSONException e) {
@@ -108,6 +120,14 @@ public class SocketIOCallback implements IOCallback {
     public void setNewConnectionListener(
             OnContactListListener newConnectionListener) {
         this.newListListener = newConnectionListener;
+    }
+
+    public OnContactChatListener getNewChatListener() {
+        return newChatListener;
+    }
+
+    public void setNewChatListener(OnContactChatListener newChatListener) {
+        this.newChatListener = newChatListener;
     }
 
 }

@@ -92,4 +92,16 @@ public class RSAUtils {
         return null;
     }
 
+    public static String getPublicKeyHash(Context c) {
+        try {
+            PublicKey priv = getPublicKey(c);
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            md.update(priv.getEncoded());
+            return Base64.encodeToString(md.digest(), Base64.DEFAULT);
+        } catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }
