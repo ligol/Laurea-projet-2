@@ -63,7 +63,7 @@ console.log("disconnected : " + message);
 	if (follow.get(response.id) != null) {
 	    var client = follow.get(response.id);
 	    for (var i = 0; i < client.length; i++) {
-		client[i].emit('disconnected', '{ \'user\':' + response.id + ', \'state\':' + true + "}");
+		client[i].emit('disconnected', '{ \'user\':' + response.id + ', \'state\':' + false + "}");
 	    };
 	}
     });
