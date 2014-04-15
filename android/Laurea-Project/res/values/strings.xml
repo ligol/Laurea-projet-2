@@ -10,5 +10,7 @@
     <string name="hiskey">Paste his key here</string>
     <string name="valid">Validate</string>
     <string name="hishash">Past his Hash here</string>
+    <string name="send">Send</string>
+    <string name="message">Message</string>
 
 </resources>

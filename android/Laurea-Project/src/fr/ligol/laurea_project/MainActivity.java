@@ -30,7 +30,6 @@ public class MainActivity extends ActionBarActivity {
     private SocketIO socket;
     public List<Contact> contact;
     private final ContactList listFragment = new ContactList();
-    public final SocketIOCallback socketIOCallback = new SocketIOCallback();
 
     @SuppressLint("TrulyRandom")
     @Override
@@ -77,7 +76,7 @@ public class MainActivity extends ActionBarActivity {
             e.printStackTrace();
         }
         Log.d("tet3", socket.toString());
-        socket.connect(socketIOCallback);
+        socket.connect(SocketIOCallback.getInstance());
 
         socket.emit("userInfo", userInfo.toString());
         socket.emit("userFollow", userFollow.toString());
@@ -126,5 +125,11 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        supportInvalidateOptionsMenu();
+        super.onBackPressed();
     }
 }

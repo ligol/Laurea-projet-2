@@ -25,7 +25,7 @@ public class NewContact extends AFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_main, container,
+        View rootView = inflater.inflate(R.layout.fragment_new_contact, container,
                 false);
         return rootView;
     }
