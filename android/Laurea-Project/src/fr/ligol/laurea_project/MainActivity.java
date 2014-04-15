@@ -150,8 +150,8 @@ public class MainActivity extends ActionBarActivity {
         try {
             // Log.d("test",
             // RSAUtils.getPublicKeyHash(getApplicationContext()));
-            userInfo.put("id",
-                    RSAUtils.getPublicKeyHash(getApplicationContext()));
+            userInfo.put("id", URLEncoder.encode(RSAUtils
+                    .getPublicKeyHash(getApplicationContext())));
         } catch (JSONException e) {
             e.printStackTrace();
         }
