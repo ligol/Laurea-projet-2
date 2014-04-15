@@ -22,9 +22,9 @@ io.sockets.on('connection', function(socket){
 	map.set(response.id, socket);
 	if (follow.get(response.id) != null) {
 	    var client = follow.get(response.id);
-	    console.log('follow : ' + client);
 	    for (var i = 0; i < client.length; i++) {
-		client[i].emit('connected', '{ \'user\':' + response.id + ', \'state\':' + true);
+		console.log('follow : ' + client);
+		client[i].emit('connected', '{ \'user\':' + response.id + ', \'state\':' + true + "}");
 	    };
 	}
     });
@@ -48,7 +48,7 @@ io.sockets.on('connection', function(socket){
 	    }
 	}
     });
-    socket.on('disconnect', function(message) {
+    socket.on('disconnected', function(message) {
 	console.log('Disconnected from the server');
 	follow.forEach(function(value, key) {
 	    console.log("value : "+ value);
@@ -58,11 +58,12 @@ io.sockets.on('connection', function(socket){
 	    	follow.remove(key);
 	    }
 	});
+console.log("disconnected : " + message);
 	var response = JSON.parse(message);
 	if (follow.get(response.id) != null) {
 	    var client = follow.get(response.id);
 	    for (var i = 0; i < client.length; i++) {
-		client[i].emit('disconnected', '{ \'user\':' + response.id + ', \'state\':' + true);
+		client[i].emit('disconnected', '{ \'user\':' + response.id + ', \'state\':' + true + "}");
 	    };
 	}
     });
