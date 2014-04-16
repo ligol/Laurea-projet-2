@@ -29,8 +29,9 @@ io.sockets.on('connection', function(socket){
 	}
     });
     socket.on('message', function(message){
+	console.log('message : ' + message);
 	var response = JSON.parse(message);
-	map.get(response.key).emit('message', message);
+	map.get(response.id).emit('message', message);
     });
     socket.on('userFollow', function(message){
 	console.log('data : ' + message);
@@ -44,8 +45,9 @@ io.sockets.on('connection', function(socket){
 	    else
 	    {
 		follow.get(response.id[i]).push(socket);
-		socket.emit('connected', '{ \'user\':' + response.id[i] + ', \'state\':' + true + "}");
 	    }
+	    if (map.get(response.id[i]) != null)
+		socket.emit('connected', '{ \'user\':' + response.id[i] + ', \'state\':' + true + "}");
 	}
     });
     socket.on('disconnected', function(message) {
@@ -58,7 +60,7 @@ io.sockets.on('connection', function(socket){
 	    	follow.remove(key);
 	    }
 	});
-console.log("disconnected : " + message);
+	console.log("disconnected : " + message);
 	var response = JSON.parse(message);
 	if (follow.get(response.id) != null) {
 	    var client = follow.get(response.id);
