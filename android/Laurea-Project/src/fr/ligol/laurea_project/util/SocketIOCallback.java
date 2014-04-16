@@ -13,11 +13,13 @@ import java.net.URLDecoder;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
 import android.util.Log;
 
 public class SocketIOCallback implements IOCallback {
     private OnContactListListener newListListener;
     private OnContactChatListener newChatListener;
+    private Context context;
 
     private SocketIOCallback() {
     }
@@ -68,7 +70,8 @@ public class SocketIOCallback implements IOCallback {
                 Log.d("message2", contact.getName());
                 m.setContact(contact);
                 m.setMe(false);
-                m.setMessage(o.getString("content"));
+                m.setMessage(RSAUtils.decrypt(getContext(),
+                        o.getString("content")));
                 m.save();
                 if (newChatListener != null) {
                     newChatListener.onMessage();
@@ -135,4 +138,11 @@ public class SocketIOCallback implements IOCallback {
         this.newChatListener = newChatListener;
     }
 
+    public Context getContext() {
+        return context;
+    }
+
+    public void setContext(Context context) {
+        this.context = context;
+    }
 }

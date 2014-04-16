@@ -75,6 +75,7 @@ public class MainActivity extends ActionBarActivity {
         // e.printStackTrace();
         // }
         Log.d("tet3", socket.toString());
+        SocketIOCallback.getInstance().setContext(getApplicationContext());
         socket.connect(SocketIOCallback.getInstance());
 
         socket.emit("userInfo", userInfo.toString());

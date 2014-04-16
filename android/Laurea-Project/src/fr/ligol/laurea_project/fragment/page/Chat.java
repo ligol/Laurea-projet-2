@@ -84,7 +84,9 @@ public class Chat extends AListFragment {
                     o.put("id", URLEncoder.encode(contact.getHisHash()));
                     o.put("sender", URLEncoder.encode(RSAUtils
                             .getPublicKeyHash(getActivity())));
-                    o.put("content", message.getText().toString());
+                    o.put("content", RSAUtils.encrypt(
+                            contact.getHisPublicKey(), message.getText()
+                                    .toString()));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
