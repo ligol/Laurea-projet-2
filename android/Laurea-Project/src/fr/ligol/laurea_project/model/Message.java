@@ -1,5 +1,7 @@
 package fr.ligol.laurea_project.model;
 
+import java.util.List;
+
 import com.orm.SugarRecord;
 
 public class Message extends SugarRecord<Message> {
@@ -38,5 +40,14 @@ public class Message extends SugarRecord<Message> {
 
     public void setContact(Contact contact) {
         this.contact = contact;
+    }
+
+    public static void setAllRead(List<Message> messages) {
+        for (Message m : messages) {
+            if (m.isRead() == false) {
+                m.setRead(true);
+                m.save();
+            }
+        }
     }
 }

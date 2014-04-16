@@ -1,5 +1,7 @@
 package fr.ligol.laurea_project.model;
 
+import java.util.List;
+
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 
@@ -42,12 +44,16 @@ public class Contact extends SugarRecord<Contact> {
         this.isConnected = isConnected;
     }
 
-    // public boolean isAllMessageRead() {
-    // for (Message m : messages) {
-    // if (m.isRead() == false) {
-    // return false;
-    // }
-    // }
-    // return true;
-    // }
+    public List<Message> getMessages() {
+        return Message.find(Message.class, "contact = ?", this.id.toString());
+    }
+
+    public boolean isAllMessageRead() {
+        for (Message m : getMessages()) {
+            if (m.isRead() == false) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

@@ -54,6 +54,7 @@ public class Chat extends AListFragment {
                         Log.d("message", "reload");
                         List<Message> m = Message.find(Message.class,
                                 "contact = ?", contact.getId().toString());
+                        Message.setAllRead(m);
                         ((ChatAdapter) getListAdapter()).update(m);
                         getActivity().runOnUiThread(dataChanged);
                     }
@@ -62,6 +63,7 @@ public class Chat extends AListFragment {
         socket = ((MainActivity) getActivity()).getSocket();
         List<Message> m = Message.find(Message.class, "contact = ?", contact
                 .getId().toString());
+        Message.setAllRead(m);
         setListAdapter(new ChatAdapter(getActivity(), m));
         send = (Button) getView().findViewById(R.id.send);
         message = (EditText) getView().findViewById(R.id.message);

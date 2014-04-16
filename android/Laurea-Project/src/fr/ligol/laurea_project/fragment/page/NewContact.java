@@ -17,6 +17,7 @@ import fr.ligol.laurea_project.fragment.AFragment;
 import fr.ligol.laurea_project.model.Contact;
 import fr.ligol.laurea_project.util.RSAUtils;
 
+@SuppressWarnings("deprecation")
 public class NewContact extends AFragment {
     private EditText login;
     private EditText hisHash;
@@ -68,7 +69,6 @@ public class NewContact extends AFragment {
 
             @Override
             public void onClick(View v) {
-                // TODO Auto-generated method stub
                 ClipboardManager cm = (ClipboardManager) getActivity()
                         .getSystemService(Context.CLIPBOARD_SERVICE);
                 cm.setText(hisHash.getText().toString());
@@ -78,7 +78,6 @@ public class NewContact extends AFragment {
 
             @Override
             public void onClick(View v) {
-                // TODO Auto-generated method stub
                 ClipboardManager cm = (ClipboardManager) getActivity()
                         .getSystemService(Context.CLIPBOARD_SERVICE);
                 hisKey.setText(cm.getText());
