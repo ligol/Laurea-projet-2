@@ -11,28 +11,56 @@ var server = http.createServer(function(req, res){
 
 map = new HashMap();
 follow = new HashMap();
+messages = new HashMap();
 
 var io = require('socket.io').listen(server);
 
 io.sockets.on('connection', function(socket){
     socket.emit('recept', 'data received');
-    socket.on('userInfo', function(message){
-	console.log('data : ' + message);
-	var response = JSON.parse(message);
-	map.set(response.id, socket);
-	if (follow.get(response.id) != null) {
-	    var client = follow.get(response.id);
-	    for (var i = 0; i < client.length; i++) {
-		console.log('follow : ' + client);
-		client[i].emit('connected', '{ \'user\':' + response.id + ', \'state\':' + true + "}");
-	    };
-	}
+    socket.on('userInfo', function(message) {
+		console.log('data : ' + message);
+		var response = JSON.parse(message);
+		map.set(response.id, socket);
+		if (follow.get(response.id) != null) {
+		    var client = follow.get(response.id);
+	    	for (var i = 0; i < client.length; i++) {
+				console.log('follow : ' + client);
+				client[i].emit('connected', '{ \'user\':' + response.id + ', \'state\':' + true + "}");
+	    	};
+		}
+		if (messages.get(response.id) != null)
+		{
+			var listmessage = messages.get(response.id)
+			for (var i = 0; i < listmessage.length; i++) {
+				map.get(response.id).emit('message', listmessage[i]);
+				messages.remove(response.id);
+			}
+		}
+
     });
+
     socket.on('message', function(message){
-	console.log('message : ' + message);
-	var response = JSON.parse(message);
-	map.get(response.id).emit('message', message);
+		console.log('message : ' + message);
+		var response = JSON.parse(message);
+		if (map.get(response.id) != null)
+		{
+			map.get(response.id).emit('message', message);
+		}
+		else
+		{
+			if (messages.get(response.id) == null)
+			{
+				var array = [];
+				array.push(message);
+				messages.set(response.id, array);
+	    	}
+	    	else
+	    	{
+				messages.get(response.id).push(message);
+	    	}
+		}
     });
+
     socket.on('userFollow', function(message){
 	console.log('data : ' + message);
 	var response = JSON.parse(message);
