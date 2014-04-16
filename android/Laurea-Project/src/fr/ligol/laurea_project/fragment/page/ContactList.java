@@ -99,7 +99,7 @@ public class ContactList extends AListFragment {
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(
                         getActivity());
-                builder.setMessage("Are you sure?")
+                builder.setMessage("Do you really want to delete this contact?")
                         .setPositiveButton("Yes", dialogClickListener)
                         .setNegativeButton("No", dialogClickListener).show();
                 return true;
