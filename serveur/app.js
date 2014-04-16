@@ -49,16 +49,17 @@ io.sockets.on('connection', function(socket){
 		}
 		else
 		{
-			if (messages.get(response.id) == null)
-			{
-				var array = [];
-				array.push(message);
-				messages.set(response.id, array);
-	    	}
-	    	else
-	    	{
-				messages.get(response.id).push(message);
-	    	}
+		    console.log("ADD MESSAGE");
+		    if (messages.get(response.id) == null)
+		    {
+			var array = [];
+			array.push(message);
+			messages.set(response.id, array);
+	    	    }
+	    	    else
+	    	    {
+			messages.get(response.id).push(message);
+	    	    }
 		}
     });
 
@@ -91,6 +92,7 @@ io.sockets.on('connection', function(socket){
 	});
 	console.log("disconnected : " + message);
 	var response = JSON.parse(message);
+	map.remove(response.id)
 	if (follow.get(response.id) != null) {
 	    var client = follow.get(response.id);
 	    for (var i = 0; i < client.length; i++) {
