@@ -31,6 +31,7 @@ io.sockets.on('connection', function(socket){
 		if (messages.get(response.id) != null)
 		{
 			var listmessage = messages.get(response.id)
+			console.log("Saved : "+ listmessage);
 			for (var i = 0; i < listmessage.length; i++) {
 				map.get(response.id).emit('message', listmessage[i]);
 				messages.remove(response.id);
