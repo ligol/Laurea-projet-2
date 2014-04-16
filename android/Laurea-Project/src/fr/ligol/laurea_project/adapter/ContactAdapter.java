@@ -27,6 +27,7 @@ public class ContactAdapter extends BaseAdapter {
     private class ViewHolder {
         TextView tvName;
         ImageView imgState;
+        ImageView imgChat;
     }
 
     @Override
@@ -37,6 +38,7 @@ public class ContactAdapter extends BaseAdapter {
             convertView = inflater.inflate(R.layout.contact_item, null);
             holder.tvName = (TextView) convertView.findViewById(R.id.login);
             holder.imgState = (ImageView) convertView.findViewById(R.id.state);
+            holder.imgChat = (ImageView) convertView.findViewById(R.id.chat);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -51,6 +53,11 @@ public class ContactAdapter extends BaseAdapter {
         } else {
             holder.imgState
                     .setImageResource(android.R.drawable.presence_invisible);
+        }
+        if (biblio.get(position).isAllMessageRead() == true) {
+            holder.imgChat.setVisibility(View.VISIBLE);
+        } else {
+            holder.imgChat.setVisibility(View.GONE);
         }
         return convertView;
     }

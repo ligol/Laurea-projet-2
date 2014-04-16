@@ -1,9 +1,14 @@
 package fr.ligol.laurea_project.util;
 
-import fr.ligol.laurea_project.listener.OnNewConnectionListener;
+import fr.ligol.laurea_project.listener.OnContactChatListener;
+import fr.ligol.laurea_project.listener.OnContactListListener;
+import fr.ligol.laurea_project.model.Contact;
+import fr.ligol.laurea_project.model.Message;
 import io.socket.IOAcknowledge;
 import io.socket.IOCallback;
 import io.socket.SocketIOException;
+
+import java.net.URLDecoder;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,23 +16,68 @@ import org.json.JSONObject;
 import android.util.Log;
 
 public class SocketIOCallback implements IOCallback {
-    private OnNewConnectionListener newConnectionListener;
+    private OnContactListListener newListListener;
+    private OnContactChatListener newChatListener;
+
+    private SocketIOCallback() {
+    }
+
+    private static class SocketIOCallbackHolder {
+        private final static SocketIOCallback instance = new SocketIOCallback();
+    }
+
+    public static SocketIOCallback getInstance() {
+        return SocketIOCallbackHolder.instance;
+    }
 
     @Override
     public void on(String event, IOAcknowledge arg1, Object... param) {
-        // TODO Auto-generated method stub
         Log.d("test", event);
         switch (event) {
         case "connected":
-            if (newConnectionListener != null) {
+            if (newListListener != null) {
                 try {
                     JSONObject o = new JSONObject((String) param[0]);
-                    newConnectionListener.newConnection(o.getString("user"),
+                    newListListener.newConnection(o.getString("user"),
                             o.getBoolean("state"));
                 } catch (JSONException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
+            }
+            break;
+        case "disconnected":
+            if (newListListener != null) {
+                try {
+                    JSONObject o = new JSONObject((String) param[0]);
+                    newListListener.newDisconnetion(o.getString("user"),
+                            o.getBoolean("state"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            break;
+        case "message":
+
+            try {
+                JSONObject o = new JSONObject((String) param[0]);
+                Message m = new Message();
+                Log.d("message", o.getString("sender"));
+                @SuppressWarnings("deprecation")
+                Contact contact = Contact.find(Contact.class, "his_hash = ?",
+                        URLDecoder.decode(o.getString("sender"))).get(0);
+                Log.d("message2", contact.getName());
+                m.setContact(contact);
+                m.setMe(false);
+                m.setMessage(o.getString("content"));
+                m.save();
+                if (newChatListener != null) {
+                    newChatListener.onMessage();
+                }
+                if (newListListener != null) {
+                    // newListListener.on
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
             break;
 
@@ -68,13 +118,21 @@ public class SocketIOCallback implements IOCallback {
         // TODO Auto-generated method stub
     }
 
-    public OnNewConnectionListener getNewConnectionListener() {
-        return newConnectionListener;
+    public OnContactListListener getNewConnectionListener() {
+        return newListListener;
     }
 
     public void setNewConnectionListener(
-            OnNewConnectionListener newConnectionListener) {
-        this.newConnectionListener = newConnectionListener;
+            OnContactListListener newConnectionListener) {
+        this.newListListener = newConnectionListener;
+    }
+
+    public OnContactChatListener getNewChatListener() {
+        return newChatListener;
+    }
+
+    public void setNewChatListener(OnContactChatListener newChatListener) {
+        this.newChatListener = newChatListener;
     }
 
 }

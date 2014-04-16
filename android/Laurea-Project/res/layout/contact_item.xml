@@ -13,6 +13,14 @@
         android:textSize="20sp" />
 
     <ImageView
+        android:id="@+id/chat"
+        android:layout_width="match_parent"
+        android:visibility="gone"
+        android:layout_height="match_parent"
+        android:layout_weight="4"
+        android:src="@drawable/ic_action_chat" />
+
+    <ImageView
         android:id="@+id/state"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

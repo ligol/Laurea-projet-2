@@ -1,13 +1,13 @@
 package fr.ligol.laurea_project;
 
 import fr.ligol.laurea_project.fragment.page.ContactList;
-import fr.ligol.laurea_project.fragment.page.NewContact;
 import fr.ligol.laurea_project.model.Contact;
 import fr.ligol.laurea_project.util.RSAUtils;
 import fr.ligol.laurea_project.util.SocketIOCallback;
 import io.socket.SocketIO;
 
 import java.net.MalformedURLException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,19 +19,17 @@ import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 
 public class MainActivity extends ActionBarActivity {
     private SocketIO socket;
     public List<Contact> contact;
     private final ContactList listFragment = new ContactList();
-    public final SocketIOCallback socketIOCallback = new SocketIOCallback();
 
+    @SuppressWarnings("deprecation")
     @SuppressLint("TrulyRandom")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +39,6 @@ public class MainActivity extends ActionBarActivity {
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, listFragment).commit();
-            supportInvalidateOptionsMenu();
         }
         SharedPreferences sp = getSharedPreferences("laurea_project",
                 MODE_PRIVATE);
@@ -58,26 +55,27 @@ public class MainActivity extends ActionBarActivity {
         JSONObject userInfo = new JSONObject();
         JSONObject userFollow = new JSONObject();
         try {
-            Log.d("test", RSAUtils.getPrivateKeyHash(getApplicationContext()));
-            userInfo.put("id",
-                    RSAUtils.getPrivateKeyHash(getApplicationContext()));
+            Log.d("test key00", URLEncoder.encode(RSAUtils
+                    .getPublicKeyHash(getApplicationContext())));
+            userInfo.put("id", URLEncoder.encode(RSAUtils
+                    .getPublicKeyHash(getApplicationContext())));
             List<String> id = new ArrayList<String>();
             for (Contact c : contact) {
-                id.add(c.getHisHash());
+                id.add(URLEncoder.encode(c.getHisHash()));
             }
             JSONArray a = new JSONArray(id);
             userFollow.put("id", a);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        try {
-            Log.d("test2", userInfo.getString("id"));
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        // try {
+        // // Log.d("test2", userInfo.getString("id"));
+        // } catch (JSONException e) {
+        // // TODO Auto-generated catch block
+        // e.printStackTrace();
+        // }
         Log.d("tet3", socket.toString());
-        socket.connect(socketIOCallback);
+        socket.connect(SocketIOCallback.getInstance());
 
         socket.emit("userInfo", userInfo.toString());
         socket.emit("userFollow", userFollow.toString());
@@ -86,8 +84,8 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu items for use in the action bar
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main, menu);
+        // MenuInflater inflater = getMenuInflater();
+        // inflater.inflate(R.menu.main, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -99,32 +97,61 @@ public class MainActivity extends ActionBarActivity {
             FragmentManager fm = getSupportFragmentManager();
             if (fm.getBackStackEntryCount() > 0) {
                 fm.popBackStack();
-                supportInvalidateOptionsMenu();
             }
-            return true;
-        case R.id.add_contact:
-            supportInvalidateOptionsMenu();
-            FragmentTransaction ft = getSupportFragmentManager()
-                    .beginTransaction();
-            ft.replace(R.id.container, new NewContact());
-            ft.addToBackStack(null);
-            ft.commit();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        FragmentManager fm = getSupportFragmentManager();
-        if (fm.getBackStackEntryCount() == 0) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-            menu.findItem(R.id.add_contact).setVisible(true);
-        } else {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            menu.findItem(R.id.add_contact).setVisible(false);
-        }
+    // @Override
+    // public boolean onPrepareOptionsMenu(Menu menu) {
+    // FragmentManager fm = getSupportFragmentManager();
+    // if (fm.getBackStackEntryCount() == 0) {
+    // getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+    // menu.findItem(R.id.add_contact).setVisible(true);
+    // } else {
+    // getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    // menu.findItem(R.id.add_contact).setVisible(false);
+    // }
+    //
+    // return true;
+    // }
 
-        return true;
+    @Override
+    public void onBackPressed() {
+        supportInvalidateOptionsMenu();
+        super.onBackPressed();
+    }
+
+    public SocketIO getSocket() {
+        return socket;
+    }
+
+    public void setSocket(SocketIO socket) {
+        this.socket = socket;
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public void onDestroy() {
+        JSONObject userInfo = new JSONObject();
+        try {
+            // Log.d("test",
+            // RSAUtils.getPublicKeyHash(getApplicationContext()));
+            userInfo.put("id", URLEncoder.encode(RSAUtils
+                    .getPublicKeyHash(getApplicationContext())));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        try {
+            Log.d("test2", userInfo.getString("id"));
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        Log.d("tet3", socket.toString());
+        socket.emit("disconnected", userInfo.toString());
+        socket.disconnect();
+        super.onDestroy();
     }
 }

@@ -10,13 +10,13 @@
         <p><input type="button" value="Envoyer un message" id="poke" /></p>
         
         <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-        <script src="/socket.io/socket.io.js"></script>
+        <script src="http://ligol.fr:8080/socket.io/socket.io.js"></script>
         <script>
             var socket = io.connect('http://ligol.fr:8080');
             var pseudo = prompt('Envoyer HASH clé publique perso!');
-            socket.emit('userInfo', pseudo);
-            var follow = prompt('Envoyer HASH clé publique follow!');
-            socket.emit('userFollow', follow);
+            socket.emit('userInfo', "{\"id\" : \"" + pseudo +"\"}");
+/*            var follow = prompt('Envoyer HASH clé publique follow!');
+            socket.emit('userFollow', follow);*/
             socket.on('recept', function(message) {
                 alert('Le serveur a un message pour vous : ' + message);
             })

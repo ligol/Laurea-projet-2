@@ -4,7 +4,7 @@ userInfo:
 {"public": ["user3-1", "user3-2", "user3-3"]}
 {"public": ["user4-1", "user4-2", "user4-3"]}
 message:
-{"key": "user2-1", "content": "Coucou je suis le user1"}
+{"id": "qOrs9Q%2FgTTIhgiLNIgU73Q%3D%3D%0A", "content": "Coucou je suis le user1", "sender": "test"}
 
 userFollow
 {"id": ["user2-1", "user3-2", "user4-3"]}
