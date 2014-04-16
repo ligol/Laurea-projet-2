@@ -14,6 +14,9 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -45,6 +48,7 @@ public class Chat extends AListFragment {
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         super.onActivityCreated(savedInstanceState);
         ((ActionBarActivity) getActivity()).getSupportActionBar()
                 .setDisplayHomeAsUpEnabled(true);
@@ -112,6 +116,30 @@ public class Chat extends AListFragment {
         SocketIOCallback.getInstance().setNewChatListener(null);
         Log.d("destroy", "fragment");
         super.onDestroy();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.delete, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        // Respond to the action bar's Up/Home button
+        case R.id.delete_message:
+            ChatAdapter c = (ChatAdapter) getListAdapter();
+            List<Message> message = Message.find(Message.class, "contact = ?",
+                    contact.getId().toString());
+            for (Message m : message) {
+                m.delete();
+            }
+            c.clear();
+            getActivity().runOnUiThread(dataChanged);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     protected Runnable dataChanged = new Runnable() {

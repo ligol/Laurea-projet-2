@@ -79,6 +79,10 @@ public class ChatAdapter extends BaseAdapter {
         biblio.addAll(list);
     }
 
+    public void clear() {
+        biblio.clear();
+    }
+
     public void add(Message m) {
         biblio.add(m);
     }
