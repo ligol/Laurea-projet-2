@@ -1,7 +1,6 @@
 package fr.ligol.laurea_project.util;
 
 import java.io.UnsupportedEncodingException;
-import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -13,10 +12,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -161,17 +157,7 @@ public class RSAUtils {
             byte[] cipherText = cipher.doFinal(Base64.decode(message,
                     Base64.DEFAULT));
             return Base64.encodeToString(cipherText, Base64.DEFAULT);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
@@ -185,17 +171,7 @@ public class RSAUtils {
             byte[] cipherText = cipher.doFinal(Base64.decode(message,
                     Base64.DEFAULT));
             return Base64.encodeToString(cipherText, Base64.DEFAULT);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
