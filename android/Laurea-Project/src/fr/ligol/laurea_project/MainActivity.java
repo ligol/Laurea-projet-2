@@ -68,12 +68,6 @@ public class MainActivity extends ActionBarActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        // try {
-        // // Log.d("test2", userInfo.getString("id"));
-        // } catch (JSONException e) {
-        // // TODO Auto-generated catch block
-        // e.printStackTrace();
-        // }
         Log.d("tet3", socket.toString());
         SocketIOCallback.getInstance().setContext(getApplicationContext());
         socket.connect(SocketIOCallback.getInstance());
@@ -154,5 +148,22 @@ public class MainActivity extends ActionBarActivity {
         socket.emit("disconnected", userInfo.toString());
         socket.disconnect();
         super.onDestroy();
+    }
+
+    @SuppressWarnings("deprecation")
+    public void resetContact() {
+        contact = Contact.listAll(Contact.class);
+        JSONObject userFollow = new JSONObject();
+        try {
+            List<String> id = new ArrayList<String>();
+            for (Contact c : contact) {
+                id.add(URLEncoder.encode(c.getHisHash()));
+            }
+            JSONArray a = new JSONArray(id);
+            userFollow.put("id", a);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        socket.emit("userFollow", userFollow.toString());
     }
 }

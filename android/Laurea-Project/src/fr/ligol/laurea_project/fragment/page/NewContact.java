@@ -12,6 +12,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import fr.ligol.laurea_project.MainActivity;
 import fr.ligol.laurea_project.R;
 import fr.ligol.laurea_project.fragment.AFragment;
 import fr.ligol.laurea_project.model.Contact;
@@ -60,9 +61,9 @@ public class NewContact extends AFragment {
                 c.setHisHash(RSAUtils.getPublicKeyHash(hisKey.getText()
                         .toString()));
                 c.save();
+                ((MainActivity) getActivity()).resetContact();
                 FragmentManager fm = getActivity().getSupportFragmentManager();
                 fm.popBackStack();
-                getActivity().supportInvalidateOptionsMenu();
             }
         });
         pasteHash.setOnClickListener(new OnClickListener() {

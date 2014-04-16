@@ -1,7 +1,10 @@
 package fr.ligol.laurea_project.fragment.page;
 
 import java.net.URLEncoder;
+import java.util.List;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
@@ -10,6 +13,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import fr.ligol.laurea_project.MainActivity;
 import fr.ligol.laurea_project.R;
@@ -17,6 +22,7 @@ import fr.ligol.laurea_project.adapter.ContactAdapter;
 import fr.ligol.laurea_project.fragment.AListFragment;
 import fr.ligol.laurea_project.listener.OnContactListListener;
 import fr.ligol.laurea_project.model.Contact;
+import fr.ligol.laurea_project.model.Message;
 import fr.ligol.laurea_project.util.SocketIOCallback;
 
 public class ContactList extends AListFragment {
@@ -62,6 +68,43 @@ public class ContactList extends AListFragment {
                         activity.runOnUiThread(dataChanged);
                     }
                 });
+        getListView().setOnItemLongClickListener(new OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
+                    int arg2, long arg3) {
+                final ContactAdapter c = (ContactAdapter) getListAdapter();
+                final Contact contact = c.getItem(arg2);
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                        case DialogInterface.BUTTON_POSITIVE:
+                            List<Message> messages = Message.find(
+                                    Message.class, "contact = ?", contact
+                                            .getId().toString());
+                            for (Message m : messages) {
+                                m.delete();
+                            }
+                            contact.delete();
+                            ((MainActivity) getActivity()).resetContact();
+                            c.update(((MainActivity) getActivity()).contact);
+                            break;
+
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            // No button clicked
+                            break;
+                        }
+                    }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(
+                        getActivity());
+                builder.setMessage("Are you sure?")
+                        .setPositiveButton("Yes", dialogClickListener)
+                        .setNegativeButton("No", dialogClickListener).show();
+                return true;
+            }
+        });
     }
 
     @Override
