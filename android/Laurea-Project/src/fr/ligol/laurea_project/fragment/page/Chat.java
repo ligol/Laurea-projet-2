@@ -8,6 +8,8 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -87,6 +89,15 @@ public class Chat extends AListFragment {
                     o.put("content", RSAUtils.encrypt(
                             contact.getHisPublicKey(), message.getText()
                                     .toString()));
+
+                    SharedPreferences sp = getActivity().getSharedPreferences(
+                            "laurea_project", Context.MODE_PRIVATE);
+                    String publicK = sp.getString("pub", null);
+                    String cipher = RSAUtils.encrypt(publicK, message.getText()
+                            .toString());
+                    Log.d("encrypt1", cipher);
+                    Log.d("encrypt3", RSAUtils.decrypt(getActivity(), cipher));
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
