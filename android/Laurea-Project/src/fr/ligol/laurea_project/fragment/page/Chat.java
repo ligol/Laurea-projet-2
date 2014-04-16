@@ -94,6 +94,13 @@ public class Chat extends AListFragment {
         });
     }
 
+    @Override
+    public void onDestroy() {
+        SocketIOCallback.getInstance().setNewChatListener(null);
+        Log.d("destroy", "fragment");
+        super.onDestroy();
+    }
+
     protected Runnable dataChanged = new Runnable() {
         @Override
         public void run() {

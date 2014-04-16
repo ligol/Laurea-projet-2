@@ -38,7 +38,7 @@ public class SocketIOCallback implements IOCallback {
             if (newListListener != null) {
                 try {
                     JSONObject o = new JSONObject((String) param[0]);
-                    newListListener.newConnection(o.getString("user"),
+                    newListListener.onConnection(o.getString("user"),
                             o.getBoolean("state"));
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -49,7 +49,7 @@ public class SocketIOCallback implements IOCallback {
             if (newListListener != null) {
                 try {
                     JSONObject o = new JSONObject((String) param[0]);
-                    newListListener.newDisconnetion(o.getString("user"),
+                    newListListener.onDisconnetion(o.getString("user"),
                             o.getBoolean("state"));
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -74,7 +74,7 @@ public class SocketIOCallback implements IOCallback {
                     newChatListener.onMessage();
                 }
                 if (newListListener != null) {
-                    // newListListener.on
+                    newListListener.onMessage();
                 }
             } catch (JSONException e) {
                 e.printStackTrace();

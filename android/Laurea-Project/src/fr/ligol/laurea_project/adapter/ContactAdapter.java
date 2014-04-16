@@ -54,10 +54,10 @@ public class ContactAdapter extends BaseAdapter {
             holder.imgState
                     .setImageResource(android.R.drawable.presence_invisible);
         }
-        if (biblio.get(position).isAllMessageRead() == true) {
+        if (biblio.get(position).isAllMessageRead() == false) {
             holder.imgChat.setVisibility(View.VISIBLE);
         } else {
-            holder.imgChat.setVisibility(View.GONE);
+            holder.imgChat.setVisibility(View.INVISIBLE);
         }
         return convertView;
     }

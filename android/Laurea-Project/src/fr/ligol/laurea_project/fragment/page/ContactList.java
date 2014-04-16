@@ -33,8 +33,21 @@ public class ContactList extends AListFragment {
         SocketIOCallback.getInstance().setNewConnectionListener(
                 new OnContactListListener() {
 
+                    @SuppressWarnings("deprecation")
                     @Override
-                    public void newConnection(String user, boolean state) {
+                    public void onConnection(String user, boolean state) {
+                        Log.d("listener", user + " " + state);
+                        for (Contact c : activity.contact) {
+                            if (URLEncoder.encode(c.getHisHash()).equals(user) == true) {
+                                c.setConnected(state);
+                            }
+                        }
+                        activity.runOnUiThread(dataChanged);
+                    }
+
+                    @SuppressWarnings("deprecation")
+                    @Override
+                    public void onDisconnetion(String user, boolean state) {
                         Log.d("listener", user + " " + state);
                         for (Contact c : activity.contact) {
                             if (URLEncoder.encode(c.getHisHash()).equals(user) == true) {
@@ -45,13 +58,7 @@ public class ContactList extends AListFragment {
                     }
 
                     @Override
-                    public void newDisconnetion(String user, boolean state) {
-                        Log.d("listener", user + " " + state);
-                        for (Contact c : activity.contact) {
-                            if (URLEncoder.encode(c.getHisHash()).equals(user) == true) {
-                                c.setConnected(state);
-                            }
-                        }
+                    public void onMessage() {
                         activity.runOnUiThread(dataChanged);
                     }
                 });
