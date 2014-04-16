@@ -8,15 +8,22 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import fr.ligol.laurea_project.MainActivity;
@@ -45,6 +52,7 @@ public class Chat extends AListFragment {
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         super.onActivityCreated(savedInstanceState);
         ((ActionBarActivity) getActivity()).getSupportActionBar()
                 .setDisplayHomeAsUpEnabled(true);
@@ -62,6 +70,8 @@ public class Chat extends AListFragment {
                     }
                 });
         contact = Contact.findById(Contact.class, getArguments().getLong("id"));
+        ((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(
+                contact.getName());
         socket = ((MainActivity) getActivity()).getSocket();
         List<Message> m = Message.find(Message.class, "contact = ?", contact
                 .getId().toString());
@@ -105,6 +115,40 @@ public class Chat extends AListFragment {
                 socket.emit("message", o.toString());
             }
         });
+
+        getListView().setOnItemLongClickListener(new OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
+                    int arg2, long arg3) {
+                final ChatAdapter c = (ChatAdapter) getListAdapter();
+                final Message message = c.getItem(arg2);
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                        case DialogInterface.BUTTON_POSITIVE:
+                            message.delete();
+                            List<Message> message = Message.find(Message.class,
+                                    "contact = ?", contact.getId().toString());
+                            c.update(message);
+                            getActivity().runOnUiThread(dataChanged);
+                            break;
+
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            // No button clicked
+                            break;
+                        }
+                    }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(
+                        getActivity());
+                builder.setMessage("Do you really want to delete this message?")
+                        .setPositiveButton("Yes", dialogClickListener)
+                        .setNegativeButton("No", dialogClickListener).show();
+                return true;
+            }
+        });
     }
 
     @Override
@@ -112,6 +156,30 @@ public class Chat extends AListFragment {
         SocketIOCallback.getInstance().setNewChatListener(null);
         Log.d("destroy", "fragment");
         super.onDestroy();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.delete, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        // Respond to the action bar's Up/Home button
+        case R.id.delete_message:
+            ChatAdapter c = (ChatAdapter) getListAdapter();
+            List<Message> message = Message.find(Message.class, "contact = ?",
+                    contact.getId().toString());
+            for (Message m : message) {
+                m.delete();
+            }
+            c.clear();
+            getActivity().runOnUiThread(dataChanged);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     protected Runnable dataChanged = new Runnable() {

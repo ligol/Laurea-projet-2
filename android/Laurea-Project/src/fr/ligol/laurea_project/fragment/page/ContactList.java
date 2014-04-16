@@ -33,6 +33,8 @@ public class ContactList extends AListFragment {
                 .setDisplayHomeAsUpEnabled(false);
         Log.d("fragment", "activitycreated");
         setHasOptionsMenu(true);
+        ((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(
+                R.string.app_name);
         super.onActivityCreated(savedInstanceState);
         final MainActivity activity = ((MainActivity) getActivity());
         setListAdapter(new ContactAdapter(getActivity(), activity.contact));

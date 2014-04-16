@@ -1,0 +1,7 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:compat="http://schemas.android.com/apk/res-auto" >
+    <item android:id="@+id/delete_message"
+      android:icon="@android:drawable/ic_menu_delete"
+      android:title="@string/delete"
+      compat:showAsAction="ifRoom"  />
+</menu>
