@@ -1,6 +1,8 @@
 package laurea_project;
 
+import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable(tableName = "Contacts")
@@ -14,6 +16,8 @@ public class Contacts {
 	private String hash;
 	@DatabaseField
 	private String publickey;
+	@ForeignCollectionField
+	private ForeignCollection<Message> messages;
 
 	public Contacts() {
 
@@ -25,6 +29,14 @@ public class Contacts {
 		this.nickname = nickname;
 		this.hash = hash;
 		this.publickey = publickey;
+	}
+
+	public ForeignCollection<Message> getMessages() {
+		return this.messages;
+	}
+
+	public void setMessage(ForeignCollection<Message> messages) {
+		this.messages = messages;
 	}
 
 	public int getId() {
@@ -61,6 +73,6 @@ public class Contacts {
 
 	@Override
 	public String toString() {
-		return nickname + " - " + hash + " - " + publickey;
+		return nickname;
 	}
 }
