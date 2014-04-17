@@ -7,20 +7,17 @@ import com.j256.ormlite.table.DatabaseTable;
 public class Check {
 
 	@DatabaseField(id = true)
-	private String id = "Id";
-	@DatabaseField
-	private Boolean isFirstLaunch = true;
+	private String id = "Keys";
 	@DatabaseField
 	private String priv;
 	@DatabaseField
 	private String pub;
 
 	public Check() {
-		
+
 	}
-	
-	public Check(Boolean isFirstLaunch, String priv, String pub) {
-		this.isFirstLaunch = isFirstLaunch;
+
+	public Check(String priv, String pub) {
 		this.priv = priv;
 		this.pub = pub;
 	}
@@ -39,14 +36,6 @@ public class Check {
 
 	public void setPub(String pub) {
 		this.pub = pub;
-	}
-
-	public boolean isFirstLaunch() {
-		return isFirstLaunch;
-	}
-
-	public void setFirstLaunch(boolean isFirstLaunch) {
-		this.isFirstLaunch = isFirstLaunch;
 	}
 
 }

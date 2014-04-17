@@ -5,6 +5,9 @@ import io.socket.SocketIO;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -40,7 +43,8 @@ public class ContactWindow {
 	private DefaultListModel<Contacts> dlm;
 	private static ContactsDao cd;
 	private static CheckDao check;
-	private static ConnectionSource connectionSource;
+	private static ConnectionSource connectionSourceContacts;
+	private static ConnectionSource connectionSourceCheck;
 	private SocketIO socket;
 
 	/**
@@ -49,13 +53,13 @@ public class ContactWindow {
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				String databaseUrl = "jdbc:sqlite:contacts.db";
 				try {
 					// DB connection
-					connectionSource = new JdbcConnectionSource(databaseUrl);
-					cd = new ContactsDao(connectionSource);
-					check = new CheckDao(connectionSource);
-					SocketIOCallback.setConnectionSource(connectionSource);
+					connectionSourceContacts = new JdbcConnectionSource("jdbc:sqlite:contacts.db");
+					connectionSourceCheck = new JdbcConnectionSource("jdbc:sqlite:check");
+					cd = new ContactsDao(connectionSourceContacts);
+					check = new CheckDao(connectionSourceCheck);
+					SocketIOCallback.setConnectionSourceContacts(connectionSourceContacts);
 					SocketIOCallback.setContactsDao(cd);
 
 					// Create the main window
@@ -79,15 +83,22 @@ public class ContactWindow {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
+
 		// Check if it is the first launch
 		boolean isFirstLaunch = true;
 		try {
-			isFirstLaunch = check.performDBCheck(connectionSource);
+			isFirstLaunch = check.performDBCheck(connectionSourceCheck);
 		} catch (SQLException e3) {
 			e3.printStackTrace();
 		}
 		if (isFirstLaunch == true) {
-			RSAUtils.generatePrivateKey(check, connectionSource);
+			RSAUtils.generatePrivateKey(check, connectionSourceCheck);
+		}
+
+		try {
+			connectionSourceCheck.close();
+		} catch (SQLException e3) {
+			e3.printStackTrace();
 		}
 
 		// Create the window
@@ -101,7 +112,7 @@ public class ContactWindow {
 
 		try {
 			// Get all DB entries
-			List<Contacts> contactList = cd.performDBSelect(connectionSource);
+			List<Contacts> contactList = cd.performDBSelect(connectionSourceContacts);
 			dlm = new DefaultListModel<Contacts>();
 
 			// Declare the socket to the server
@@ -112,7 +123,7 @@ public class ContactWindow {
 			JSONObject userFollow = new JSONObject();
 
 			// Set JSON Object
-			userInfo.put("id", RSAUtils.getPublicKeyHash(check, connectionSource));
+			userInfo.put("id", RSAUtils.getPublicKeyHash(check, connectionSourceCheck));
 
 			list = new JList<Contacts>(dlm);
 			List<String> id = new ArrayList<String>();
@@ -123,6 +134,21 @@ public class ContactWindow {
 				id.add(contact.getHash());	// for JSON Objects
 			}
 			list.setModel(dlm);
+			list.setSelectedIndex(0);
+
+			// Create the double click listener
+			MouseListener mouseListener = new MouseAdapter() {
+				public void mouseClicked(MouseEvent e) {
+					if (e.getClickCount() == 2) {
+						Contacts selectedItem = list.getSelectedValue();
+
+						// Create the chat window
+						ChatWindow chat = new ChatWindow(frame, selectedItem.getNickname());
+						chat.setVisible(true);
+					}
+				}
+			};
+			list.addMouseListener(mouseListener);
 			JSONArray a = new JSONArray(id);
 			userFollow.put("id", a);
 
@@ -164,7 +190,7 @@ public class ContactWindow {
 					newContact.setPublickey(dialog.getPublicKey());
 
 					// Save the new contact in the DB and put it in the list
-					cd.performDBInsert(connectionSource, newContact);
+					cd.performDBInsert(connectionSourceContacts, newContact);
 					dlm.addElement(newContact);
 					list.setModel(dlm);
 				} catch (Exception e1) {
@@ -177,7 +203,7 @@ public class ContactWindow {
 		mntmExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					connectionSource.close();
+					connectionSourceContacts.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}

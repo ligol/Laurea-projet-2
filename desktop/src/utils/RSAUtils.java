@@ -34,8 +34,8 @@ public class RSAUtils {
 			KeyPair kp = kpg.genKeyPair();
 			String publicK = Base64.encodeBytes(kp.getPublic().getEncoded());
 			String privateK = Base64.encodeBytes(kp.getPrivate().getEncoded());
-			Check update = new Check(false, privateK, publicK);
-			check.performDBUpdate(connectionSource, update);
+			Check update = new Check(privateK, publicK);
+			check.performDBInsert(connectionSource, update);
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {

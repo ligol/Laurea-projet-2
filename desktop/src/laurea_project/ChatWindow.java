@@ -2,6 +2,7 @@ package laurea_project;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -16,16 +17,18 @@ public class ChatWindow extends JFrame implements ActionListener {
 	private JTextArea	message = new JTextArea();
 	private JTextField	chat	= new JTextField();
 
-	public ChatWindow(String title) {
+	public ChatWindow(Frame parentFrame, String title) {
 		super(title);
-		setLayout(new BorderLayout());
+		getContentPane().setLayout(new BorderLayout());
 		setSize(400, 300);
+		setLocationRelativeTo(parentFrame);	// window center
 		setButton();
 		setTextField();
-		add(message, BorderLayout.CENTER);
-		add(chat, BorderLayout.NORTH);
+		getContentPane().add(message, BorderLayout.CENTER);
+		chat.setEditable(false);
+		getContentPane().add(chat, BorderLayout.NORTH);
 		chat.setPreferredSize(new Dimension(300, 200));
-		add(send, BorderLayout.EAST);
+		getContentPane().add(send, BorderLayout.EAST);
 	}
 
 	private void setButton() {

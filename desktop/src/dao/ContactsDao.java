@@ -24,23 +24,17 @@ public class ContactsDao extends BaseDaoImpl<Contacts, Integer> implements Conta
 	public void performDBInsert(ConnectionSource connectionSource, Contacts contact)
 			throws SQLException {
 		contactsDao = DaoManager.createDao(connectionSource, Contacts.class);
-		// create table
-		TableUtils.createTableIfNotExists(connectionSource, Contacts.class);
 
 		// save objects to DB
 		contactsDao.create(contact);
 
-		// retrieve all objects from DB
-		List<Contacts> list = contactsDao.queryForAll();
-		System.out.println("*******List of objects saved in DB*******");
-		for (Contacts contacts : list) {
-			System.out.println(contacts);
-		}
 	}
 
 	public List<Contacts> performDBSelect(ConnectionSource connectionSource)
 			throws SQLException {
 		contactsDao = DaoManager.createDao(connectionSource, Contacts.class);
+		// create table
+		TableUtils.createTableIfNotExists(connectionSource, Contacts.class);
 
 		// select objects from DB
 		List<Contacts> contactList = contactsDao.queryForAll();

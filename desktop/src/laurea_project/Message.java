@@ -10,14 +10,12 @@ public class Message {
 	private int id;
 	@DatabaseField
 	private String message;
-	@DatabaseField
+	@DatabaseField(foreign = true, foreignAutoRefresh = true, columnName = "contact_id")
 	private Contacts contact;
 	@DatabaseField
 	private Boolean me;
 	@DatabaseField
 	private Boolean read = false;
-	@DatabaseField(foreign = true, foreignAutoRefresh = true, columnName = "contact_id")
-	private Contacts contacts;
 
 	public Message() {
 
@@ -29,14 +27,6 @@ public class Message {
 
 	public void setId(int id) {
 		this.id = id;
-	}
-
-	public Contacts getContacts() {
-		return contacts;
-	}
-
-	public void setContacts(Contacts contacts) {
-		this.contacts = contacts;
 	}
 
 	public String getMessage() {
