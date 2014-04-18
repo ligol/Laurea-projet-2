@@ -1,4 +1,4 @@
-package laurea_project;
+package objects;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -63,7 +63,8 @@ public class Message {
 
 	@Override
 	public String toString() {
-		return contact.getNickname() + ": " + message;
+		if (getMe() == true) return "Me: " + message;
+		else return contact.getNickname() + ": " + message;
 	}
 
 }

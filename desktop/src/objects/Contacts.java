@@ -1,4 +1,4 @@
-package laurea_project;
+package objects;
 
 import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;

@@ -23,6 +23,10 @@ import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
+import objects.Check;
+import objects.Contacts;
+import objects.Message;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,20 +34,21 @@ import org.json.JSONObject;
 import utils.RSAUtils;
 import utils.SocketIOCallback;
 
+import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
-
-import dao.CheckDao;
-import dao.ContactsDao;
+import com.j256.ormlite.table.TableUtils;
 
 public class ContactWindow {
 
 	private JFrame frame;
 	private JList<Contacts> list;
 	private DefaultListModel<Contacts> dlm;
-	private static ContactsDao cd;
-	private static CheckDao check;
-	private static ConnectionSource connectionSourceContacts;
+	private static Dao<Contacts, Integer> contactsDao;
+	private static Dao<Message, Integer> messageDao;
+	private static Dao<Check, String> check;
+	private static ConnectionSource connectionSource;
 	private static ConnectionSource connectionSourceCheck;
 	private SocketIO socket;
 
@@ -55,12 +60,11 @@ public class ContactWindow {
 			public void run() {
 				try {
 					// DB connection
-					connectionSourceContacts = new JdbcConnectionSource("jdbc:sqlite:contacts.db");
+					connectionSource = new JdbcConnectionSource("jdbc:sqlite:data.db");
 					connectionSourceCheck = new JdbcConnectionSource("jdbc:sqlite:check");
-					cd = new ContactsDao(connectionSourceContacts);
-					check = new CheckDao(connectionSourceCheck);
-					SocketIOCallback.setConnectionSourceContacts(connectionSourceContacts);
-					SocketIOCallback.setContactsDao(cd);
+					setupDataBases();
+					SocketIOCallback.setContactsDao(contactsDao);
+					SocketIOCallback.setMessageDao(messageDao);
 
 					// Create the main window
 					ContactWindow window = new ContactWindow();
@@ -70,6 +74,16 @@ public class ContactWindow {
 				}
 			}
 		});
+	}
+
+	protected static void setupDataBases() throws SQLException {
+		contactsDao = DaoManager.createDao(connectionSource, Contacts.class);
+		messageDao = DaoManager.createDao(connectionSource, Message.class);
+		check = DaoManager.createDao(connectionSourceCheck, Check.class);
+
+		TableUtils.createTableIfNotExists(connectionSource, Contacts.class);
+		TableUtils.createTableIfNotExists(connectionSource, Message.class);
+		TableUtils.createTableIfNotExists(connectionSourceCheck, Check.class);
 	}
 
 	/**
@@ -85,20 +99,12 @@ public class ContactWindow {
 	private void initialize() {
 
 		// Check if it is the first launch
-		boolean isFirstLaunch = true;
 		try {
-			isFirstLaunch = check.performDBCheck(connectionSourceCheck);
-		} catch (SQLException e3) {
-			e3.printStackTrace();
-		}
-		if (isFirstLaunch == true) {
-			RSAUtils.generatePrivateKey(check, connectionSourceCheck);
-		}
-
-		try {
-			connectionSourceCheck.close();
-		} catch (SQLException e3) {
-			e3.printStackTrace();
+			if (check.idExists("Keys") == false) {
+				RSAUtils.generatePrivateKey(check);
+			}
+		} catch (SQLException e4) {
+			e4.printStackTrace();
 		}
 
 		// Create the window
@@ -112,7 +118,8 @@ public class ContactWindow {
 
 		try {
 			// Get all DB entries
-			List<Contacts> contactList = cd.performDBSelect(connectionSourceContacts);
+			List<Contacts> contactList = contactsDao.queryForAll();
+
 			dlm = new DefaultListModel<Contacts>();
 
 			// Declare the socket to the server
@@ -123,7 +130,13 @@ public class ContactWindow {
 			JSONObject userFollow = new JSONObject();
 
 			// Set JSON Object
-			userInfo.put("id", RSAUtils.getPublicKeyHash(check, connectionSourceCheck));
+			userInfo.put("id", RSAUtils.getPublicKeyHash(check));
+
+			try {
+				connectionSourceCheck.close();
+			} catch (SQLException e3) {
+				e3.printStackTrace();
+			}
 
 			list = new JList<Contacts>(dlm);
 			List<String> id = new ArrayList<String>();
@@ -142,9 +155,11 @@ public class ContactWindow {
 					if (e.getClickCount() == 2) {
 						Contacts selectedItem = list.getSelectedValue();
 
-						// Create the chat window
-						ChatWindow chat = new ChatWindow(frame, selectedItem.getNickname());
-						chat.setVisible(true);
+						if (selectedItem != null) {
+							// Create the chat window
+							ChatWindow chat = new ChatWindow(frame, selectedItem, messageDao);
+							chat.setVisible(true);
+						}
 					}
 				}
 			};
@@ -183,16 +198,18 @@ public class ContactWindow {
 					// Get informations of the new contact pop up
 					AddContact dialog = new AddContact(frame);
 
-					// Create the new contact object
-					Contacts newContact = new Contacts();
-					newContact.setNickname(dialog.getNickname());
-					newContact.setHash(dialog.getHash());
-					newContact.setPublickey(dialog.getPublicKey());
+					if (dialog.getNickname() != null && dialog.getHash() != null && dialog.getPublicKey() != null) {
+						// Create the new contact object
+						Contacts newContact = new Contacts();
+						newContact.setNickname(dialog.getNickname());
+						newContact.setHash(dialog.getHash());
+						newContact.setPublickey(dialog.getPublicKey());
 
-					// Save the new contact in the DB and put it in the list
-					cd.performDBInsert(connectionSourceContacts, newContact);
-					dlm.addElement(newContact);
-					list.setModel(dlm);
+						// Save the new contact in the DB and put it in the list
+						contactsDao.create(newContact);
+						dlm.addElement(newContact);
+						list.setModel(dlm);
+					}
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -203,7 +220,7 @@ public class ContactWindow {
 		mntmExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					connectionSourceContacts.close();
+					connectionSource.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}

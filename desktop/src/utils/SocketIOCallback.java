@@ -5,28 +5,23 @@ import io.socket.IOCallback;
 import io.socket.SocketIOException;
 
 import java.sql.SQLException;
+import java.util.List;
 
-import laurea_project.Contacts;
-import laurea_project.Message;
 import listener.OnContactChatListener;
 import listener.OnContactListListener;
+import objects.Contacts;
+import objects.Message;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.j256.ormlite.jdbc.JdbcConnectionSource;
-import com.j256.ormlite.support.ConnectionSource;
-
-import dao.ContactsDao;
-import dao.MessageDao;
+import com.j256.ormlite.dao.Dao;
 
 public class SocketIOCallback implements IOCallback {
 	private OnContactListListener newListListener;
 	private OnContactChatListener newChatListener;
-	private static ConnectionSource connectionSourceContacts;
-	private static ConnectionSource connectionSourceMessages;
-	private static ContactsDao cd;
-	private static MessageDao mess;
+	private static Dao<Contacts, Integer> contactsDao;
+	private static Dao<Message, Integer> messageDao;
 
 	private SocketIOCallback() {
 	}
@@ -69,16 +64,14 @@ public class SocketIOCallback implements IOCallback {
 				try {
 					JSONObject o = new JSONObject((String) param[0]);
 					Message m = new Message();
-					Contacts contact = cd.performDBfind(connectionSourceContacts, o.getString("sender"));
-					m.setContact(contact);
+
+					List<Contacts> contact = contactsDao.queryBuilder().where().eq("hash", o.getString("sender")).query();
+
+					m.setContact(contact.get(0));
 					m.setMe(false);
 					m.setMessage(o.getString("content"));
 
-					// Save the message in the DB
-					connectionSourceMessages = new JdbcConnectionSource("jdbc:sqlite:messagesdb");
-					mess = new MessageDao(connectionSourceMessages);
-					mess.performDBInsert(connectionSourceMessages, m);
-					connectionSourceMessages.close();
+					messageDao.create(m);
 
 					if (newChatListener != null) {
 						newChatListener.onMessage();
@@ -142,28 +135,20 @@ public class SocketIOCallback implements IOCallback {
 		this.newChatListener = newChatListener;
 	}
 
-	public static ConnectionSource getConnectionSourceContacts() {
-		return connectionSourceContacts;
+	public Dao<Contacts, Integer> getContactsDao() {
+		return contactsDao;
 	}
 
-	public static void setConnectionSourceContacts(ConnectionSource connectionSourceContacts) {
-		SocketIOCallback.connectionSourceContacts = connectionSourceContacts;
+	public static void setContactsDao(Dao<Contacts, Integer> cd) {
+		SocketIOCallback.contactsDao = cd;
 	}
 
-	public ContactsDao getConactsDao() {
-		return cd;
+	public static Dao<Message, Integer> getMessageDao() {
+		return messageDao;
 	}
 
-	public static void setContactsDao(ContactsDao cd) {
-		SocketIOCallback.cd = cd;
-	}
-
-	public static MessageDao getMess() {
-		return mess;
-	}
-
-	public static void setMess(MessageDao mess) {
-		SocketIOCallback.mess = mess;
+	public static void setMessageDao(Dao<Message, Integer> mess) {
+		SocketIOCallback.messageDao = mess;
 	}
 
 }
