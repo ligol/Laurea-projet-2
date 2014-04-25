@@ -90,6 +90,7 @@ public class ContactList extends AListFragment {
                             contact.delete();
                             ((MainActivity) getActivity()).resetContact();
                             c.update(((MainActivity) getActivity()).contact);
+                            getActivity().runOnUiThread(dataChanged);
                             break;
 
                         case DialogInterface.BUTTON_NEGATIVE:
