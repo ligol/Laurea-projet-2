@@ -5,10 +5,12 @@ import io.socket.IOCallback;
 import io.socket.SocketIOException;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import listener.OnContactChatListener;
 import listener.OnContactListListener;
+import objects.Check;
 import objects.Contacts;
 import objects.Message;
 
@@ -19,9 +21,10 @@ import com.j256.ormlite.dao.Dao;
 
 public class SocketIOCallback implements IOCallback {
 	private OnContactListListener newListListener;
-	private OnContactChatListener newChatListener;
+	private List<OnContactChatListener> newChatListener = new ArrayList<OnContactChatListener>();
 	private static Dao<Contacts, Integer> contactsDao;
 	private static Dao<Message, Integer> messageDao;
+	private static Dao<Check, String> checkDao;
 
 	private SocketIOCallback() {
 	}
@@ -41,8 +44,7 @@ public class SocketIOCallback implements IOCallback {
 			if (newListListener != null) {
 				try {
 					JSONObject o = new JSONObject((String) param[0]);
-					newListListener.newConnection(o.getString("user"),
-							o.getBoolean("state"));
+					newListListener.onConnection(o.getString("user"), o.getBoolean("state"));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -52,7 +54,7 @@ public class SocketIOCallback implements IOCallback {
 			if (newListListener != null) {
 				try {
 					JSONObject o = new JSONObject((String) param[0]);
-					newListListener.newDisconnetion(o.getString("user"),
+					newListListener.onDisconnetion(o.getString("user"),
 							o.getBoolean("state"));
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -60,27 +62,28 @@ public class SocketIOCallback implements IOCallback {
 			}
 			break;
 		case "message":
-			if (newListListener != null) {
-				try {
-					JSONObject o = new JSONObject((String) param[0]);
-					Message m = new Message();
+			try {
+				JSONObject o = new JSONObject((String) param[0]);
+				Message m = new Message();
 
-					List<Contacts> contact = contactsDao.queryBuilder().where().eq("hash", o.getString("sender")).query();
+				List<Contacts> contact = contactsDao.queryBuilder().where().eq("hash", o.getString("sender")).query();
 
-					m.setContact(contact.get(0));
-					m.setMe(false);
-					m.setMessage(o.getString("content"));
+				m.setContact(contact.get(0));
+				m.setMe(false);
+				m.setMessage(RSAUtils.decrypt(checkDao, o.getString("content")));
 
-					messageDao.create(m);
+				messageDao.create(m);
 
-					if (newChatListener != null) {
-						newChatListener.onMessage();
+				if (newChatListener != null) {
+					for (OnContactChatListener chat : newChatListener) {
+						chat.onMessage(m);
 					}
-					newListListener.newDisconnetion(o.getString("user"),
-							o.getBoolean("state"));
-				} catch (JSONException | SQLException e) {
-					e.printStackTrace();
 				}
+				if (newListListener != null) {
+					newListListener.onMessage();
+				}
+			} catch (JSONException | SQLException e) {
+				e.printStackTrace();
 			}
 			break;
 
@@ -127,12 +130,8 @@ public class SocketIOCallback implements IOCallback {
 		this.newListListener = newConnectionListener;
 	}
 
-	public OnContactChatListener getNewChatListener() {
-		return newChatListener;
-	}
-
 	public void setNewChatListener(OnContactChatListener newChatListener) {
-		this.newChatListener = newChatListener;
+		this.newChatListener.add(newChatListener);
 	}
 
 	public Dao<Contacts, Integer> getContactsDao() {
@@ -149,6 +148,14 @@ public class SocketIOCallback implements IOCallback {
 
 	public static void setMessageDao(Dao<Message, Integer> mess) {
 		SocketIOCallback.messageDao = mess;
+	}
+
+	public static Dao<Check, String> getCheckDao() {
+		return checkDao;
+	}
+
+	public static void setCheckDao(Dao<Check, String> checkDao) {
+		SocketIOCallback.checkDao = checkDao;
 	}
 
 }

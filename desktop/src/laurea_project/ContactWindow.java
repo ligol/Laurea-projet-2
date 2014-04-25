@@ -47,7 +47,7 @@ public class ContactWindow {
 	private DefaultListModel<Contacts> dlm;
 	private static Dao<Contacts, Integer> contactsDao;
 	private static Dao<Message, Integer> messageDao;
-	private static Dao<Check, String> check;
+	private static Dao<Check, String> checkDao;
 	private static ConnectionSource connectionSource;
 	private static ConnectionSource connectionSourceCheck;
 	private SocketIO socket;
@@ -65,6 +65,7 @@ public class ContactWindow {
 					setupDataBases();
 					SocketIOCallback.setContactsDao(contactsDao);
 					SocketIOCallback.setMessageDao(messageDao);
+					SocketIOCallback.setCheckDao(checkDao);
 
 					// Create the main window
 					ContactWindow window = new ContactWindow();
@@ -79,7 +80,7 @@ public class ContactWindow {
 	protected static void setupDataBases() throws SQLException {
 		contactsDao = DaoManager.createDao(connectionSource, Contacts.class);
 		messageDao = DaoManager.createDao(connectionSource, Message.class);
-		check = DaoManager.createDao(connectionSourceCheck, Check.class);
+		checkDao = DaoManager.createDao(connectionSourceCheck, Check.class);
 
 		TableUtils.createTableIfNotExists(connectionSource, Contacts.class);
 		TableUtils.createTableIfNotExists(connectionSource, Message.class);
@@ -100,8 +101,8 @@ public class ContactWindow {
 
 		// Check if it is the first launch
 		try {
-			if (check.idExists("Keys") == false) {
-				RSAUtils.generatePrivateKey(check);
+			if (checkDao.idExists("Keys") == false) {
+				RSAUtils.generatePrivateKey(checkDao);
 			}
 		} catch (SQLException e4) {
 			e4.printStackTrace();
@@ -125,18 +126,15 @@ public class ContactWindow {
 			// Declare the socket to the server
 			socket = new SocketIO("http://ligol.fr:8080/");
 
+			// Initialize the socket to the server
+			socket.connect(SocketIOCallback.getInstance());
+
 			// Declare JSON Object in order to send them later to the server
 			JSONObject userInfo = new JSONObject();
 			JSONObject userFollow = new JSONObject();
 
 			// Set JSON Object
-			userInfo.put("id", RSAUtils.getPublicKeyHash(check));
-
-			try {
-				connectionSourceCheck.close();
-			} catch (SQLException e3) {
-				e3.printStackTrace();
-			}
+			userInfo.put("id", RSAUtils.getPublicKeyHash(checkDao));
 
 			list = new JList<Contacts>(dlm);
 			List<String> id = new ArrayList<String>();
@@ -157,7 +155,7 @@ public class ContactWindow {
 
 						if (selectedItem != null) {
 							// Create the chat window
-							ChatWindow chat = new ChatWindow(frame, selectedItem, messageDao);
+							ChatWindow chat = new ChatWindow(frame, selectedItem, messageDao, checkDao, socket);
 							chat.setVisible(true);
 						}
 					}
@@ -166,9 +164,6 @@ public class ContactWindow {
 			list.addMouseListener(mouseListener);
 			JSONArray a = new JSONArray(id);
 			userFollow.put("id", a);
-
-			// Initialize the socket to the server
-			socket.connect(SocketIOCallback.getInstance());
 
 			// Send to the server
 			socket.emit("userInfo", userInfo.toString());
@@ -196,13 +191,13 @@ public class ContactWindow {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					// Get informations of the new contact pop up
-					AddContact dialog = new AddContact(frame);
+					AddContact dialog = new AddContact(frame, checkDao);
 
-					if (dialog.getNickname() != null && dialog.getHash() != null && dialog.getPublicKey() != null) {
+					if (dialog.getNickname() != null && dialog.getPublicKey() != null) {
 						// Create the new contact object
 						Contacts newContact = new Contacts();
 						newContact.setNickname(dialog.getNickname());
-						newContact.setHash(dialog.getHash());
+						newContact.setHash(RSAUtils.getPublicKeyHash(dialog.getPublicKey()));
 						newContact.setPublickey(dialog.getPublicKey());
 
 						// Save the new contact in the DB and put it in the list
@@ -221,6 +216,8 @@ public class ContactWindow {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					connectionSource.close();
+					connectionSourceCheck.close();
+					socket.disconnect();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}

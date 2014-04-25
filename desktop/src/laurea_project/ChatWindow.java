@@ -1,5 +1,7 @@
 package laurea_project;
 
+import io.socket.SocketIO;
+
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -16,24 +18,49 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import listener.OnContactChatListener;
+import objects.Check;
 import objects.Contacts;
 import objects.Message;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import utils.RSAUtils;
+import utils.SocketIOCallback;
 
 import com.j256.ormlite.dao.Dao;
 
 public class ChatWindow extends JFrame {
 
 	private Dao<Message, Integer> messageDao;
+	private Dao<Check, String> checkDao;
 	private JPanel contentPane;
 	private JTextArea chatHistory;
 	private JTextField message;
 	private static Contacts contact;
+	private SocketIO socket;
 
-	public ChatWindow(Frame parentFrame, Contacts selectedContact, Dao<Message, Integer> messDao) {
+	public ChatWindow(Frame parentFrame, Contacts selectedContact, Dao<Message, Integer> messDao, Dao<Check, String> check, SocketIO sock) {
 		super(selectedContact.getNickname());
 		setResizable(false);
 		setContact(selectedContact);
 		setMessageDao(messDao);
+		setCheckDao(check);
+		setSocket(sock);
+		SocketIOCallback.getInstance().setNewChatListener(new OnContactChatListener() {
+
+			@Override
+			public void onMessage(Message m) {
+				// TODO Auto-generated method stub
+				if (m.getContact().getId() == contact.getId())
+				{
+					if (chatHistory.getText().length() > 0) chatHistory.insert("\n", chatHistory.getText().length());
+					chatHistory.insert(m.toString(), chatHistory.getText().length());
+				}
+
+			}
+		});
 
 		setSize(400, 300);
 		setLocationRelativeTo(parentFrame);	// window center
@@ -95,7 +122,24 @@ public class ChatWindow extends JFrame {
 					e.printStackTrace();
 				}
 
-				message.setText(""); // reset the message entry				
+				JSONObject o = new JSONObject();
+				try {
+					o.put("id", contact.getHash());
+					o.put("sender", RSAUtils.getPublicKeyHash(checkDao));
+					o.put("content", RSAUtils.encrypt(contact.getPublickey(), message.getText()));
+					String key = checkDao.queryForId("Keys").getPub();
+					System.out.println(RSAUtils.decrypt(checkDao, RSAUtils.encrypt(key, message.getText())));
+					System.out.println(contact.getPublickey());
+				} catch (JSONException e) {
+					e.printStackTrace();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				socket.emit("message", o.toString());
+
+				message.setText(""); // reset the message entry
+
 			}
 		});
 		contentPane.add(send, gbc_send);
@@ -118,8 +162,16 @@ public class ChatWindow extends JFrame {
 		this.messageDao = mess;
 	}
 
+	public void setCheckDao(Dao<Check, String> checkDao) {
+		this.checkDao = checkDao;
+	}
+
 	public void setContact(Contacts contact) {
 		ChatWindow.contact = contact;
+	}
+
+	public void setSocket(SocketIO sock) {
+		this.socket = sock;
 	}
 
 }

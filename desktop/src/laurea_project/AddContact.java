@@ -7,35 +7,40 @@ import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
+
+import objects.Check;
+
+import com.j256.ormlite.dao.Dao;
 
 public class AddContact extends JDialog implements ActionListener {
 
 	private final JPanel contentPanel = new JPanel();
 	private JTextField tfNickname;
 	private JLabel lblNickname;
-	private JTextField tfHash;
-	private JTextField tfPublicKey;
-	private JLabel lblHash;
-	private JLabel lblPublicKey;
 	private String nickname;
-	private String hash;
+	private JTextField tfPublicKey;
+	private JLabel lblPublicKey;
 	private String publickey;
 	private JButton okButton;
+	private JLabel lblMyPublicKey;
+	private JTextArea tAMyPublicKey;
 
 
 	/**
 	 * Create the dialog.
 	 */
-	AddContact(Frame parentFrame) {
+	AddContact(Frame parentFrame, Dao<Check, String> checkDao) throws SQLException {
 		super(parentFrame, "Add a new Contact", true);
 		setType(Type.POPUP);
 		setResizable(false);
@@ -59,17 +64,6 @@ public class AddContact extends JDialog implements ActionListener {
 		lblNickname.setLabelFor(tfNickname);
 		contentPanel.add(tfNickname);
 		{
-			lblHash = new JLabel("Hash");
-			lblHash.setHorizontalAlignment(SwingConstants.CENTER);
-			contentPanel.add(lblHash);
-		}
-		{
-			tfHash = new JTextField();
-			lblHash.setLabelFor(tfHash);
-			contentPanel.add(tfHash);
-			tfHash.setColumns(10);
-		}
-		{
 			lblPublicKey = new JLabel("Public key");
 			lblPublicKey.setHorizontalAlignment(SwingConstants.CENTER);
 			contentPanel.add(lblPublicKey);
@@ -79,6 +73,20 @@ public class AddContact extends JDialog implements ActionListener {
 			lblPublicKey.setLabelFor(tfPublicKey);
 			contentPanel.add(tfPublicKey);
 			tfPublicKey.setColumns(10);
+		}
+		{
+			lblMyPublicKey = new JLabel("My public key is :");
+			lblMyPublicKey.setHorizontalAlignment(SwingConstants.CENTER);
+			contentPanel.add(lblMyPublicKey);
+		}
+		{
+			tAMyPublicKey = new JTextArea();
+			tAMyPublicKey.setLineWrap(true);
+			tAMyPublicKey.setWrapStyleWord(true);
+			lblMyPublicKey.setLabelFor(tAMyPublicKey);
+			tAMyPublicKey.setText(checkDao.queryForId("Keys").getPub());
+			tAMyPublicKey.setEditable(false);
+			contentPanel.add(tAMyPublicKey);
 		}
 		{
 			JPanel buttonPane = new JPanel();
@@ -106,10 +114,6 @@ public class AddContact extends JDialog implements ActionListener {
 		return nickname;
 	}
 
-	public String getHash() {
-		return hash;
-	}
-
 	public String getPublicKey() {
 		return publickey;
 	}
@@ -118,11 +122,9 @@ public class AddContact extends JDialog implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == okButton) {
 			nickname = tfNickname.getText();
-			hash = tfHash.getText();
 			publickey = tfPublicKey.getText();
 		} else {
 			nickname = null;
-			hash = null;
 			publickey = null;
 		}
 		setVisible(false);

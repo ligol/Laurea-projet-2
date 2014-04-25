@@ -14,6 +14,8 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.sql.SQLException;
 
+import javax.crypto.Cipher;
+
 import objects.Check;
 
 import org.java_websocket.util.Base64;
@@ -87,6 +89,24 @@ public class RSAUtils {
 		return null;
 	}
 
+	public static PublicKey getPublicKey(String publicK)
+			throws UnsupportedEncodingException {
+		try {
+			byte[] keyBytes = Base64.decode(publicK);
+			X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
+			KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+			PublicKey key = keyFactory.generatePublic(spec);
+			return key;
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (InvalidKeySpecException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	public static String getPrivateKeyHash(Dao<Check, String> check) {
 		try {
 			PrivateKey priv = getPrivateKey(check);
@@ -102,7 +122,7 @@ public class RSAUtils {
 	public static String getPublicKeyHash(Dao<Check, String> check) {
 		try {
 			PublicKey priv = getPublicKey(check);
-			MessageDigest md = MessageDigest.getInstance("SHA-256");
+			MessageDigest md = MessageDigest.getInstance("MD5");
 			md.update(priv.getEncoded());
 			return Base64.encodeBytes(md.digest());
 		} catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
@@ -111,4 +131,65 @@ public class RSAUtils {
 		return null;
 	}
 
+	public static String getPublicKeyHash(String c) {
+		try {
+			PublicKey priv = getPublicKey(c);
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			md.update(priv.getEncoded());
+			return Base64.encodeBytes(md.digest());
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public static String encrypt(String key, String message) {
+		try {
+			PublicKey pubKey = getPublicKey(key);
+			Cipher cipher = Cipher.getInstance("RSA");
+			cipher.init(Cipher.ENCRYPT_MODE, pubKey);
+			byte[] cipherText = cipher.doFinal(message.getBytes());
+			return byteArrayToHexString(cipherText);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public static String decrypt(Dao<Check, String> check, String message) {
+		try {
+			PrivateKey pubKey = getPrivateKey(check);
+			Cipher cipher = Cipher.getInstance("RSA");
+			cipher.init(Cipher.DECRYPT_MODE, pubKey);
+			byte[] cipherText = cipher.doFinal(hexStringToByteArray(message));
+			return new String(cipherText);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	private static String byteArrayToHexString(byte[] b) {
+		StringBuffer sb = new StringBuffer(b.length * 2);
+		for (int i = 0; i < b.length; i++) {
+			int v = b[i] & 0xff;
+			if (v < 16) {
+				sb.append('0');
+			}
+			sb.append(Integer.toHexString(v));
+		}
+		return sb.toString().toUpperCase();
+	}
+
+	private static byte[] hexStringToByteArray(String s) {
+		byte[] b = new byte[s.length() / 2];
+		for (int i = 0; i < b.length; i++) {
+			int index = i * 2;
+			int v = Integer.parseInt(s.substring(index, index + 2), 16);
+			b[i] = (byte) v;
+		}
+		return b;
+	}
 }
