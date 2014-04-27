@@ -8,8 +8,6 @@ import io.socket.IOAcknowledge;
 import io.socket.IOCallback;
 import io.socket.SocketIOException;
 
-import java.net.URLDecoder;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -64,12 +62,13 @@ public class SocketIOCallback implements IOCallback {
                 JSONObject o = new JSONObject((String) param[0]);
                 Message m = new Message();
                 Log.d("message", o.getString("sender"));
-                @SuppressWarnings("deprecation")
                 Contact contact = Contact.find(Contact.class, "his_hash = ?",
-                        URLDecoder.decode(o.getString("sender"))).get(0);
+                        o.getString("sender")).get(0);
                 Log.d("message2", contact.getName());
                 m.setContact(contact);
                 m.setMe(false);
+                Log.d("messagetest",
+                        RSAUtils.decrypt(getContext(), o.getString("content")));
                 m.setMessage(RSAUtils.decrypt(getContext(),
                         o.getString("content")));
                 m.save();

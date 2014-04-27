@@ -2,7 +2,6 @@ package fr.ligol.laurea_project.fragment.page;
 
 import io.socket.SocketIO;
 
-import java.net.URLEncoder;
 import java.util.List;
 
 import org.json.JSONException;
@@ -80,9 +79,13 @@ public class Chat extends AListFragment {
         send = (Button) getView().findViewById(R.id.send);
         message = (EditText) getView().findViewById(R.id.message);
         send.setOnClickListener(new OnClickListener() {
-            @SuppressWarnings("deprecation")
             @Override
             public void onClick(View v) {
+                Log.d("encrypttest", "his|" + contact.getHisPublicKey() + "|");
+                SharedPreferences sp = getActivity().getSharedPreferences(
+                        "laurea_project", Context.MODE_PRIVATE);
+                String publicK = sp.getString("pub", null);
+                Log.d("encrypttest", "my|" + publicK + "|");
                 Message newMessage = new Message();
                 newMessage.setContact(contact);
                 newMessage.setMe(true);
@@ -93,20 +96,11 @@ public class Chat extends AListFragment {
                 ((ChatAdapter) getListAdapter()).notifyDataSetChanged();
                 JSONObject o = new JSONObject();
                 try {
-                    o.put("id", URLEncoder.encode(contact.getHisHash()));
-                    o.put("sender", URLEncoder.encode(RSAUtils
-                            .getPublicKeyHash(getActivity())));
+                    o.put("id", contact.getHisHash());
+                    o.put("sender", RSAUtils.getPublicKeyHash(getActivity()));
                     o.put("content", RSAUtils.encrypt(
                             contact.getHisPublicKey(), message.getText()
                                     .toString()));
-
-                    SharedPreferences sp = getActivity().getSharedPreferences(
-                            "laurea_project", Context.MODE_PRIVATE);
-                    String publicK = sp.getString("pub", null);
-                    String cipher = RSAUtils.encrypt(publicK, message.getText()
-                            .toString());
-                    Log.d("encrypt1", cipher);
-                    Log.d("encrypt3", RSAUtils.decrypt(getActivity(), cipher));
 
                 } catch (JSONException e) {
                     e.printStackTrace();

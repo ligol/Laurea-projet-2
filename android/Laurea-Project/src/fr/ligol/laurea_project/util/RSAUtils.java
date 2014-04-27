@@ -1,5 +1,6 @@
 package fr.ligol.laurea_project.util;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -14,12 +15,14 @@ import java.security.spec.X509EncodedKeySpec;
 
 import javax.crypto.Cipher;
 
+import org.java_websocket.util.Base64;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Base64;
 import android.util.Log;
 
+@SuppressLint("DefaultLocale")
 public class RSAUtils {
     @SuppressLint("TrulyRandom")
     public static void generatePrivateKey(Context c) {
@@ -32,12 +35,10 @@ public class RSAUtils {
 
             kpg.initialize(1024);
             KeyPair kp = kpg.genKeyPair();
-            String publicK = Base64.encodeToString(kp.getPublic().getEncoded(),
-                    Base64.DEFAULT);
-            String privateK = Base64.encodeToString(kp.getPrivate()
-                    .getEncoded(), Base64.DEFAULT);
-            sp.edit().putString("priv", privateK).commit();
-            sp.edit().putString("pub", publicK).commit();
+            String publicK = Base64.encodeBytes(kp.getPublic().getEncoded());
+            String privateK = Base64.encodeBytes(kp.getPrivate().getEncoded());
+            sp.edit().putString("priv", privateK.replace("\n", "")).commit();
+            sp.edit().putString("pub", publicK.replace("\n", "")).commit();
             sp.edit().putBoolean("private", true).commit();
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
@@ -50,7 +51,7 @@ public class RSAUtils {
             SharedPreferences sp = c.getSharedPreferences("laurea_project",
                     Context.MODE_PRIVATE);
             String privateK = sp.getString("priv", null);
-            byte[] keyBytes = Base64.decode(privateK, Base64.DEFAULT);
+            byte[] keyBytes = Base64.decode(privateK);
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
             KeyFactory fact = KeyFactory.getInstance("RSA");
             PrivateKey priv = fact.generatePrivate(keySpec);
@@ -58,6 +59,9 @@ public class RSAUtils {
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return null;
@@ -70,7 +74,7 @@ public class RSAUtils {
                     Context.MODE_PRIVATE);
             String publicK = sp.getString("pub", null);
             // Log.d("printkey", publicK.replace("\n", "+"));
-            byte[] keyBytes = Base64.decode(publicK, Base64.DEFAULT);
+            byte[] keyBytes = Base64.decode(publicK);
             // Log.d("printkey2", new String(keyBytes).replace("\n", "+"));
             X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
@@ -82,6 +86,9 @@ public class RSAUtils {
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return null;
@@ -91,7 +98,7 @@ public class RSAUtils {
             throws UnsupportedEncodingException {
         try {
             // Log.d("printkey", publicK.replace("\n", "+"));
-            byte[] keyBytes = Base64.decode(publicK, Base64.DEFAULT);
+            byte[] keyBytes = Base64.decode(publicK);
             // Log.d("printkey2", new String(keyBytes).replace("\n", "+"));
             X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
@@ -103,6 +110,9 @@ public class RSAUtils {
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return null;
@@ -113,7 +123,7 @@ public class RSAUtils {
             PrivateKey priv = getPrivateKey(c);
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             md.update(priv.getEncoded());
-            return Base64.encodeToString(md.digest(), Base64.DEFAULT);
+            return Base64.encodeBytes(md.digest());
         } catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
@@ -128,7 +138,7 @@ public class RSAUtils {
             // .replace("\n", "+"));
             MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(priv.getEncoded());
-            return Base64.encodeToString(md.digest(), Base64.DEFAULT);
+            return Base64.encodeBytes(md.digest()).replace("\n", "");
         } catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
@@ -140,7 +150,7 @@ public class RSAUtils {
             PublicKey priv = getPublicKey(c);
             MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(priv.getEncoded());
-            return Base64.encodeToString(md.digest(), Base64.DEFAULT);
+            return Base64.encodeBytes(md.digest()).replace("\n", "");
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
@@ -153,7 +163,7 @@ public class RSAUtils {
         try {
             Log.d("encrypt3", message.replace(" ", "+"));
             PublicKey pubKey = getPublicKey(key);
-            Cipher cipher = Cipher.getInstance("RSA");
+            Cipher cipher = Cipher.getInstance("RSA/NONE/PKCS1Padding");
             cipher.init(Cipher.ENCRYPT_MODE, pubKey);
             byte[] cipherText = cipher.doFinal(message.getBytes());
             return byteArrayToHexString(cipherText);
@@ -166,7 +176,7 @@ public class RSAUtils {
     public static String decrypt(Context c, String message) {
         try {
             PrivateKey pubKey = getPrivateKey(c);
-            Cipher cipher = Cipher.getInstance("RSA");
+            Cipher cipher = Cipher.getInstance("RSA/NONE/PKCS1Padding");
             cipher.init(Cipher.DECRYPT_MODE, pubKey);
             byte[] cipherText = cipher.doFinal(hexStringToByteArray(message));
             return new String(cipherText);
@@ -176,6 +186,7 @@ public class RSAUtils {
         return null;
     }
 
+    @SuppressLint("DefaultLocale")
     private static String byteArrayToHexString(byte[] b) {
         StringBuffer sb = new StringBuffer(b.length * 2);
         for (int i = 0; i < b.length; i++) {

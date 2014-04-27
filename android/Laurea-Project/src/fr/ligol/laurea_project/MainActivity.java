@@ -7,7 +7,6 @@ import fr.ligol.laurea_project.util.SocketIOCallback;
 import io.socket.SocketIO;
 
 import java.net.MalformedURLException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +28,6 @@ public class MainActivity extends ActionBarActivity {
     public List<Contact> contact;
     private final ContactList listFragment = new ContactList();
 
-    @SuppressWarnings("deprecation")
     @SuppressLint("TrulyRandom")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,13 +53,13 @@ public class MainActivity extends ActionBarActivity {
         JSONObject userInfo = new JSONObject();
         JSONObject userFollow = new JSONObject();
         try {
-            Log.d("test key00", URLEncoder.encode(RSAUtils
-                    .getPublicKeyHash(getApplicationContext())));
-            userInfo.put("id", URLEncoder.encode(RSAUtils
-                    .getPublicKeyHash(getApplicationContext())));
+            Log.d("test key00",
+                    RSAUtils.getPublicKeyHash(getApplicationContext()));
+            userInfo.put("id",
+                    RSAUtils.getPublicKeyHash(getApplicationContext()));
             List<String> id = new ArrayList<String>();
             for (Contact c : contact) {
-                id.add(URLEncoder.encode(c.getHisHash()));
+                id.add(c.getHisHash());
             }
             JSONArray a = new JSONArray(id);
             userFollow.put("id", a);
@@ -126,15 +124,14 @@ public class MainActivity extends ActionBarActivity {
         this.socket = socket;
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public void onDestroy() {
         JSONObject userInfo = new JSONObject();
         try {
             // Log.d("test",
             // RSAUtils.getPublicKeyHash(getApplicationContext()));
-            userInfo.put("id", URLEncoder.encode(RSAUtils
-                    .getPublicKeyHash(getApplicationContext())));
+            userInfo.put("id",
+                    RSAUtils.getPublicKeyHash(getApplicationContext()));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -150,14 +147,13 @@ public class MainActivity extends ActionBarActivity {
         super.onDestroy();
     }
 
-    @SuppressWarnings("deprecation")
     public void resetContact() {
         contact = Contact.listAll(Contact.class);
         JSONObject userFollow = new JSONObject();
         try {
             List<String> id = new ArrayList<String>();
             for (Contact c : contact) {
-                id.add(URLEncoder.encode(c.getHisHash()));
+                id.add(c.getHisHash());
             }
             JSONArray a = new JSONArray(id);
             userFollow.put("id", a);

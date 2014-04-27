@@ -1,6 +1,5 @@
 package fr.ligol.laurea_project.fragment.page;
 
-import java.net.URLEncoder;
 import java.util.List;
 
 import android.app.AlertDialog;
@@ -41,24 +40,25 @@ public class ContactList extends AListFragment {
         SocketIOCallback.getInstance().setNewConnectionListener(
                 new OnContactListListener() {
 
-                    @SuppressWarnings("deprecation")
                     @Override
                     public void onConnection(String user, boolean state) {
                         Log.d("listener", user + " " + state);
                         for (Contact c : activity.contact) {
-                            if (URLEncoder.encode(c.getHisHash()).equals(user) == true) {
+                            Log.d("listenerconnected",
+                                    user + " " + c.getHisHash());
+                            if (c.getHisHash().equals(user) == true) {
                                 c.setConnected(state);
+                                Log.d("listenerconnected", "works");
                             }
                         }
                         activity.runOnUiThread(dataChanged);
                     }
 
-                    @SuppressWarnings("deprecation")
                     @Override
                     public void onDisconnetion(String user, boolean state) {
                         Log.d("listener", user + " " + state);
                         for (Contact c : activity.contact) {
-                            if (URLEncoder.encode(c.getHisHash()).equals(user) == true) {
+                            if (c.getHisHash().equals(user) == true) {
                                 c.setConnected(state);
                             }
                         }

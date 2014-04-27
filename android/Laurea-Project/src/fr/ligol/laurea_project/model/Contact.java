@@ -21,7 +21,7 @@ public class Contact extends SugarRecord<Contact> {
     }
 
     public String getHisHash() {
-        return hisHash;
+        return hisHash.replace("\n", "");
     }
 
     public void setHisHash(String hisHash) {

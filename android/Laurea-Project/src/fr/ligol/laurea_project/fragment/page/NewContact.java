@@ -57,9 +57,9 @@ public class NewContact extends AFragment {
             public void onClick(View v) {
                 Contact c = new Contact();
                 c.setName(login.getText().toString());
-                c.setHisPublicKey(hisKey.getText().toString());
-                c.setHisHash(RSAUtils.getPublicKeyHash(hisKey.getText()
-                        .toString()));
+                c.setHisPublicKey(hisKey.getText().toString().replace("\n", ""));
+                c.setHisHash(RSAUtils.getPublicKeyHash(
+                        hisKey.getText().toString()).replace("\n", ""));
                 c.save();
                 ((MainActivity) getActivity()).resetContact();
                 FragmentManager fm = getActivity().getSupportFragmentManager();
